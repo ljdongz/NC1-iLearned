@@ -8,16 +8,27 @@
 import SwiftUI
 
 struct HomeView: View {
+    @State private var viewModel = HomeViewModel()
     
     var body: some View {
         ZStack {
             AppColor.background.ignoresSafeArea(.all)
             
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
+            if viewModel.isLoading {
+                Image(systemName: "globe")
+                    .imageScale(.large)
+                    .foregroundStyle(.white)
+            } else {
+                Image(systemName: "globe")
+                    .imageScale(.large)
+                    .foregroundStyle(.tint)
+            }
+            
         }
         .frame(width: 600, height: 700)
+        .onAppear {
+            viewModel.fetchAllLink()
+        }
     }
 }
 

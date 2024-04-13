@@ -10,17 +10,13 @@ import CloudKit
 
 class CloudService {
     
-    enum RecordType: String {
-        case monthlyGoal = "MonthlyGoal"
-        case link = "Link"
-    }
-    
     static let shared = CloudService()
 
     private let container = CKContainer(identifier: "iCloud.NC1-TIL")
+    private let recordType = "Link"
     
     func saveLink(_ link: Link) {
-        let record = CKRecord(recordType: RecordType.link.rawValue)
+        let record = CKRecord(recordType: recordType)
         record["title"] = link.title
         record["url"] = link.url
         record["date"] = link.date.convertUTCTimeFromNow() as NSDate
@@ -38,23 +34,32 @@ class CloudService {
     
     
     
-    func fetchLinks() {
-        //let date = Date().convertUTCTimeFromMonth()
-        
+    func fetchLinks(completion: @escaping (Result<[Link], Error>) -> Void) {
+        var links: [Link] = []
         let predicate = NSPredicate(value: true)
         //let predicate = NSPredicate(format: "date >= %@", date as NSDate)
         
-        let query = CKQuery(recordType: RecordType.link.rawValue, predicate: predicate)
+        let query = CKQuery(recordType: recordType, predicate: predicate)
         let operation = CKQueryOperation(query: query)
         
         operation.database = container.publicCloudDatabase
         operation.recordMatchedBlock = { recordID, result in
             switch result {
             case .success(let record):
-                let link = self.convertLinkFromRecord(from: record)
-                print(link)
+                if let link = self.convertLinkFromRecord(from: record) {
+                    links.append(link)
+                }
             case .failure(let error):
-                print(error)
+                completion(.failure(error))
+            }
+        }
+        
+        operation.queryResultBlock = { result in
+            switch result {
+            case .success:
+                completion(.success(links))
+            case .failure(let error):
+                completion(.failure(error))
             }
         }
         

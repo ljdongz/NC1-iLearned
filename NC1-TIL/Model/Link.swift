@@ -7,6 +7,12 @@
 
 import Foundation
 
+struct TILData {
+    var date: Date
+    var days: Int
+    var links: [Link]
+}
+
 struct Link {
     var title: String
     var url: String
