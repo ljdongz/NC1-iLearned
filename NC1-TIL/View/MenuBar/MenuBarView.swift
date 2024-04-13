@@ -14,7 +14,7 @@ struct MenuBarView: View {
     @State private var urlText = ""
     
     @FocusState private var isFocused: Bool
-    @State private var isCompleted = true
+    @State private var isCompleted = false
     
     var body: some View {
         VStack {
@@ -55,8 +55,7 @@ fileprivate struct InputView: View {
                 
                 Text("URL")
                     .font(.system(size: 16, weight: .semibold))
-                TextField("", text: $titleText)
-                    .focused($isFocused)
+                TextField("", text: $urlText)
                 
                 Spacer()
                     .frame(height: 20)
@@ -64,7 +63,8 @@ fileprivate struct InputView: View {
             
             Button(
                 action: {
-                    isCompleted = false
+                    CloudService.shared.saveLink(Link(title: titleText, url: urlText, date: .now))
+                    isCompleted = true
                 },
                 label: {
                     Text("Save")
