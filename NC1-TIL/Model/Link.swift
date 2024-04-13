@@ -7,13 +7,7 @@
 
 import Foundation
 
-struct TILData {
-    var date: Date
-    var days: Int
-    var links: [Link]
-}
-
-struct Link {
+struct Link: Equatable, Hashable {
     var title: String
     var url: String
     var date: Date

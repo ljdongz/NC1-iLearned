@@ -9,14 +9,19 @@ import Foundation
 
 @Observable
 class HomeViewModel {
-    var tilData: [TILData] = []
+    var monthlys: [Monthly] = []
     var isLoading: Bool = true
+    var currentIndex: Int?
+    var totalContributions: Int = 0
     
+    
+    /// 모든 LInk 데이터를 가져옴
     func fetchAllLink() {
         CloudService.shared.fetchLinks { result in
             switch result {
             case .success(let links):
-                self.convertToTILData(links)
+                self.createMonthlys(links)
+                self.totalContributions = links.count
                 self.isLoading = false
             case .failure(let error):
                 print(error)
@@ -24,7 +29,9 @@ class HomeViewModel {
         }
     }
     
-    func convertToTILData(_ links: [Link]) {
+    /// Link 데이터로 Monthlys 데이터를 만듦
+    /// - Parameter links: [Link] 데이터
+    func createMonthlys(_ links: [Link]) {
         let calendar = Calendar.current
         
         var currentDate = links[0].date.convertYearAndMonthDate()
@@ -33,12 +40,15 @@ class HomeViewModel {
         let dic = groupedLink(links)
         
         while currentDate <= endDate {
-            tilData.append(TILData(date: currentDate, days: currentDate.daysInMonth(), links: dic[currentDate] ?? []))
+            monthlys.append(Monthly(date: currentDate, days: currentDate.daysInMonth(), links: dic[currentDate] ?? []))
             
             currentDate = calendar.date(byAdding: .month, value: 1, to: currentDate)!
         }
     }
     
+    /// Link 데이터를 Date별로 그룹화
+    /// - Parameter links: [Link] 데이터
+    /// - Returns: [Date: [Link]]
     func groupedLink(_ links: [Link]) -> [Date: [Link]] {
         var dic: [Date: [Link]] = [:]
         for link in links {
@@ -50,5 +60,9 @@ class HomeViewModel {
             }
         }
         return dic
+    }
+    
+    func scrollToCurrentDate() {
+        currentIndex = monthlys.count - 1
     }
 }
