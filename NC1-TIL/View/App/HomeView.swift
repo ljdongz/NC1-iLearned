@@ -10,12 +10,14 @@ import SwiftUI
 struct HomeView: View {
     
     var body: some View {
-        VStack {
+        ZStack {
+            AppColor.background.ignoresSafeArea(.all)
+            
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
         }
-        .padding()
+        .frame(width: 600, height: 700)
     }
 }
 

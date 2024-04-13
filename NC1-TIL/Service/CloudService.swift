@@ -36,13 +36,13 @@ class CloudService {
         }
     }
     
+    
+    
     func fetchLinks() {
-        let calendar = Calendar.current
-        var dateComponents = DateComponents()
-        dateComponents.weekOfYear = -1
-        let lastWeekDate = calendar.date(byAdding: dateComponents, to: Date())!
-//        let predicate = NSPredicate(value: true)
-        let predicate = NSPredicate(format: "date > %@", Date() as NSDate)
+        //let date = Date().convertUTCTimeFromMonth()
+        
+        let predicate = NSPredicate(value: true)
+        //let predicate = NSPredicate(format: "date >= %@", date as NSDate)
         
         let query = CKQuery(recordType: RecordType.link.rawValue, predicate: predicate)
         let operation = CKQueryOperation(query: query)

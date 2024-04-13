@@ -19,4 +19,15 @@ extension Date {
 
         return calendar.date(from: components)!
     }
+    
+    func convertUTCTimeFromMonth() -> Self {
+        let calendar = Calendar.current
+        var components = DateComponents()
+        
+        components.year = calendar.component(.year, from: self)
+        components.month = calendar.component(.month, from: self)
+        components.hour = 9
+
+        return calendar.date(from: components)!
+    }
 }
