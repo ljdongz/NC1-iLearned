@@ -45,6 +45,7 @@ fileprivate struct MainView: View {
     }
     
     fileprivate var body: some View {
+        
         VStack {
             Text("Today I Learned!")
                 .font(.system(size: 40, weight: .bold))
@@ -65,8 +66,10 @@ fileprivate struct MainView: View {
             
             MonthlyView(viewModel: viewModel)
             
-            Spacer()
+            
         }
+        
+        
         .onAppear {
             viewModel.scrollToCurrentDate()
         }
@@ -80,7 +83,7 @@ fileprivate struct MonthlyView: View {
         ScrollView(.horizontal) {
             LazyHStack(spacing: 30) {
                 ForEach(Array(viewModel.monthlys.enumerated()), id: \.1) { idx, monthly in
-                    LinkListView(viewModel: viewModel)
+                    ContentsView(monthly: monthly)
                         .containerRelativeFrame(.horizontal)
                         .id(idx)
                 }
@@ -92,37 +95,37 @@ fileprivate struct MonthlyView: View {
     }
 }
 
-fileprivate struct LinkListView: View {
-    var viewModel: HomeViewModel
+fileprivate struct ContentsView: View {
+    var monthly: Monthly
     
     fileprivate var body: some View {
         ZStack {
             AppColor.dark
             
-            
-            
             VStack {
                 HStack {
                     HStack {
                         Circle()
-                            .frame(width: 20, height: 20)
+                            .frame(width: 15, height: 15)
                             .foregroundStyle(AppColor.red)
                         Circle()
-                            .frame(width: 20, height: 20)
+                            .frame(width: 15, height: 15)
                             .foregroundStyle(AppColor.yellow)
                         Circle()
-                            .frame(width: 20, height: 20)
+                            .frame(width: 15, height: 15)
                             .foregroundStyle(AppColor.green)
                     }
                     
                     Spacer()
                 }
                 .padding()
+                .background(AppColor.gray)
                 
-                Text("[SwiftUI] Observation으로 SwiftUI 데이터 모델을 간소화하자")
-                    .font(.system(size: 16))
+                
                 
                 Spacer()
+                
+                LinkListView(links: monthly.links)
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -130,6 +133,56 @@ fileprivate struct LinkListView: View {
     }
 }
 
+fileprivate struct LinkListView: View {
+    var links: [Link]
+    
+    fileprivate var body: some View {
+        TabView {
+            
+            ForEach(links.chunked(into: 3), id: \.self) { chunk in
+                VStack {
+                    ForEach(chunk, id: \.self) { link in
+                        LinkListCellView(link: link)
+                            
+                    }
+                }
+                
+            }
+        }
+    }
+}
+
+fileprivate struct LinkListCellView: View {
+    var link: Link
+    
+    fileprivate var body: some View {
+        
+        VStack {
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .resizable()
+                        .frame(width: 30, height: 30)
+                    
+                    Text(link.title)
+                        .lineLimit(1)
+                        .font(.system(size: 18))
+                        .padding(.leading, 20)
+                    
+                    Spacer()
+                }
+                .padding(.vertical)
+                .padding(.horizontal, 30)
+                .foregroundStyle(AppColor.dark)
+                .background(AppColor.background)
+                .clipShape(RoundedRectangle(cornerRadius: 50))
+            
+            
+        }
+    }
+}
+
 #Preview {
     HomeView()
 }
+
+

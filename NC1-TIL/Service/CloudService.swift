@@ -27,7 +27,6 @@ class CloudService {
                 print("Error saving record: \(error)")
                 return
             }
-            
             print("Record saved successfully")
         }
     }
@@ -40,6 +39,8 @@ class CloudService {
         //let predicate = NSPredicate(format: "date >= %@", date as NSDate)
         
         let query = CKQuery(recordType: recordType, predicate: predicate)
+        query.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
+        
         let operation = CKQueryOperation(query: query)
         
         operation.database = container.publicCloudDatabase
