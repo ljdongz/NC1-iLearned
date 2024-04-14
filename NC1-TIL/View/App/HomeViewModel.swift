@@ -17,6 +17,8 @@ class HomeViewModel {
     
     /// 모든 LInk 데이터를 가져옴
     func fetchAllLink() {
+        isLoading = true
+        
         CloudService.shared.fetchLinks { result in
             switch result {
             case .success(let links):
@@ -29,6 +31,10 @@ class HomeViewModel {
         }
     }
     
+    func deleteLink(_ link: URLLink) {
+        CloudService.shared.deleteLink(link.recordID)
+    }
+    
     /// Link 데이터로 Monthlys 데이터를 만듦
     /// - Parameter links: [Link] 데이터
     func createMonthlys(_ links: [URLLink]) {
@@ -38,6 +44,7 @@ class HomeViewModel {
         let endDate = links[links.count-1].date.convertYearAndMonthDate()
         
         let dic = groupedLink(links)
+        monthlys = []
         
         while currentDate <= endDate {
             monthlys.append(Monthly(date: currentDate, days: currentDate.daysInMonth(), links: dic[currentDate] ?? []))

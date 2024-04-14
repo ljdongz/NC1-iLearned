@@ -15,11 +15,11 @@ class CloudService {
     private let container = CKContainer(identifier: "iCloud.NC1-TIL")
     private let recordType = "Link"
     
-    func saveLink(_ link: URLLink) {
+    func saveLink(title: String, url: String) {
         let record = CKRecord(recordType: recordType)
-        record["title"] = link.title
-        record["url"] = link.url
-        record["date"] = link.date.convertUTCTimeFromNow() as NSDate
+        record["title"] = title
+        record["url"] = url
+        record["date"] = Date().convertUTCTimeFromNow() as NSDate
         
         let publicDatabase = container.publicCloudDatabase
         publicDatabase.save(record) { _, error in
@@ -30,8 +30,6 @@ class CloudService {
             print("Record saved successfully")
         }
     }
-    
-    
     
     func fetchLinks(completion: @escaping (Result<[URLLink], Error>) -> Void) {
         var links: [URLLink] = []
@@ -67,14 +65,23 @@ class CloudService {
         operation.start()
     }
     
+    func deleteLink(_ recordID: CKRecord.ID) {
+        container.publicCloudDatabase.delete(withRecordID: recordID) { recordID, error in
+                print("삭제완료:", recordID)
+                print(error)
+            }
+    }
+    
     func convertLinkFromRecord(from record: CKRecord) -> URLLink? {
-        guard let title = record.value(forKey: "title") as? String,
+        
+        guard let recordID = record.value(forKey: "recordID") as? CKRecord.ID,
+              let title = record.value(forKey: "title") as? String,
               let url = record.value(forKey: "url") as? String,
               let date = record.value(forKey: "date") as? Date else {
             return nil
         }
         
-        return URLLink(title: title, url: url, date: date)
+        return URLLink(recordID: recordID, title: title, url: url, date: date)
     }
     
         

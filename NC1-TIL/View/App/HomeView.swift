@@ -15,7 +15,7 @@ struct HomeView: View {
             AppColor.background.ignoresSafeArea(.all)
             
             if viewModel.isLoading {
-                LoadingView()
+                SplashView()
             } else {
                 MainView(viewModel: viewModel)
             }
@@ -28,7 +28,8 @@ struct HomeView: View {
     }
 }
 
-fileprivate struct LoadingView: View {
+// MARK: - 로딩 화면
+fileprivate struct SplashView: View {
     
     fileprivate var body: some View {
         VStack {
@@ -37,6 +38,7 @@ fileprivate struct LoadingView: View {
     }
 }
 
+// MARK: - 메인 화면
 fileprivate struct MainView: View {
     @Bindable private var viewModel: HomeViewModel
     
@@ -47,6 +49,8 @@ fileprivate struct MainView: View {
     fileprivate var body: some View {
         
         VStack {
+            RefreshButton(viewModel: viewModel)
+            
             Text("Today I Learned!")
                 .font(.system(size: 40, weight: .bold))
                 .foregroundStyle(AppColor.dark)
@@ -68,14 +72,33 @@ fileprivate struct MainView: View {
             
             
         }
-        
-        
         .onAppear {
             viewModel.scrollToCurrentDate()
         }
     }
 }
 
+fileprivate struct RefreshButton: View {
+    var viewModel: HomeViewModel
+    
+    fileprivate var body: some View {
+        
+        HStack {
+            Text("최근 업데이트: \(Date().convertToString())")
+            Button(
+                action: {
+                    viewModel.fetchAllLink()
+                },
+                label: {
+                    Image(systemName: "arrow.clockwise")
+            })
+        }
+        .font(.system(size: 14))
+        .foregroundStyle(AppColor.gray)
+    }
+}
+
+// MARK: - 월별 화면
 fileprivate struct MonthlyView: View {
     @Bindable var viewModel: HomeViewModel
     
@@ -83,7 +106,7 @@ fileprivate struct MonthlyView: View {
         ScrollView(.horizontal) {
             LazyHStack(spacing: 30) {
                 ForEach(Array(viewModel.monthlys.enumerated()), id: \.1) { idx, monthly in
-                    ContentsView(monthly: monthly)
+                    ContentsView(viewModel: viewModel, monthly: monthly)
                         .containerRelativeFrame(.horizontal)
                         .id(idx)
                 }
@@ -95,7 +118,9 @@ fileprivate struct MonthlyView: View {
     }
 }
 
+// MARK: - 월별 컨텐츠 화면
 fileprivate struct ContentsView: View {
+    var viewModel: HomeViewModel
     var monthly: Monthly
     
     fileprivate var body: some View {
@@ -121,11 +146,13 @@ fileprivate struct ContentsView: View {
                 .padding()
                 .background(AppColor.gray)
                 
-                
+                Text("\(monthly.date.currentMonth())월")
+                    .font(.system(size: 20))
+                    .foregroundStyle(AppColor.background)
                 
                 Spacer()
                 
-                LinkListView(links: monthly.links)
+                LinkListView(viewModel: viewModel, links: monthly.links)
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -133,7 +160,9 @@ fileprivate struct ContentsView: View {
     }
 }
 
+// MARK: - 링크 리스트 화면
 fileprivate struct LinkListView: View {
+    var viewModel: HomeViewModel
     var links: [URLLink]
     
     fileprivate var body: some View {
@@ -142,7 +171,7 @@ fileprivate struct LinkListView: View {
             ForEach(links.chunked(into: 3), id: \.self) { chunk in
                 VStack {
                     ForEach(chunk, id: \.self) { link in
-                        LinkListCellView(link: link)
+                        LinkListCellView(viewModel: viewModel, link: link)
                             
                     }
                 }
@@ -152,7 +181,9 @@ fileprivate struct LinkListView: View {
     }
 }
 
+// MARK: - 링크 리스트 셀 화면
 fileprivate struct LinkListCellView: View {
+    var viewModel: HomeViewModel
     var link: URLLink
     
     fileprivate var body: some View {
@@ -162,19 +193,31 @@ fileprivate struct LinkListCellView: View {
                 Image(systemName: "magnifyingglass")
                     .resizable()
                     .frame(width: 30, height: 30)
+                    .foregroundStyle(AppColor.dark)
                 
                 Link(destination: URL(string: link.url)!, label: {
                     Text(link.title)
                         .lineLimit(1)
                         .font(.system(size: 15))
                         .padding(.leading, 20)
+                        .foregroundStyle(AppColor.dark)
                 })
                 
                 Spacer()
+                
+                Button(
+                    action: {
+                        viewModel.deleteLink(link)
+                    },
+                    label: {
+                        Text("삭제")
+                            .font(.system(size: 14))
+                            .foregroundStyle(AppColor.red)
+                })
+                    
             }
             .padding(.vertical, 10)
             .padding(.horizontal, 30)
-            .foregroundStyle(AppColor.dark)
             .background(AppColor.background)
             .clipShape(RoundedRectangle(cornerRadius: 50))
         }
@@ -183,7 +226,7 @@ fileprivate struct LinkListCellView: View {
 }
 
 #Preview {
-    HomeView()
+        HomeView()
 }
 
 

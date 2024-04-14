@@ -60,4 +60,10 @@ extension Date {
     func currentMonth() -> Int {
         return Calendar.current.component(.month, from: self)
     }
+    
+    func convertToString() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M월 dd일 hh:mm"
+        return formatter.string(from: self)
+    }
 }
