@@ -15,7 +15,7 @@ class CloudService {
     private let container = CKContainer(identifier: "iCloud.NC1-TIL")
     private let recordType = "Link"
     
-    func saveLink(title: String, url: String) {
+    func saveLink(title: String, url: String, completion: @escaping (Result<String, Error>) -> Void) {
         let record = CKRecord(recordType: recordType)
         record["title"] = title
         record["url"] = url
@@ -24,10 +24,9 @@ class CloudService {
         let publicDatabase = container.publicCloudDatabase
         publicDatabase.save(record) { _, error in
             if let error = error {
-                print("Error saving record: \(error)")
-                return
+                completion(.failure(error))
             }
-            print("Record saved successfully")
+            completion(.success("저장 완료"))
         }
     }
     
@@ -65,11 +64,14 @@ class CloudService {
         operation.start()
     }
     
-    func deleteLink(_ recordID: CKRecord.ID) {
+    func deleteLink(_ recordID: CKRecord.ID, completion: @escaping (Result<String, Error>) -> Void) {
         container.publicCloudDatabase.delete(withRecordID: recordID) { recordID, error in
-                print("삭제완료:", recordID)
-                print(error)
+            if let error = error {
+                completion(.failure(error))
             }
+            
+            completion(.success("삭제 완료"))
+        }
     }
     
     func convertLinkFromRecord(from record: CKRecord) -> URLLink? {

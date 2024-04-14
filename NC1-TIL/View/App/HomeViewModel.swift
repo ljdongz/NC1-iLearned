@@ -32,7 +32,14 @@ class HomeViewModel {
     }
     
     func deleteLink(_ link: URLLink) {
-        CloudService.shared.deleteLink(link.recordID)
+        CloudService.shared.deleteLink(link.recordID) { result in
+            switch result {
+            case .success(let success):
+                print(success)
+            case .failure(let failure):
+                print(failure.localizedDescription)
+            }
+        }
     }
     
     /// Link 데이터로 Monthlys 데이터를 만듦

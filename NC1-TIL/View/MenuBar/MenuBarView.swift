@@ -9,19 +9,17 @@ import Foundation
 import SwiftUI
 
 struct MenuBarView: View {
-    
-    @State private var titleText = ""
-    @State private var urlText = ""
-    
-    @FocusState private var isFocused: Bool
-    @State private var isCompleted = false
+    @State private var viewModel = MenuBarViewModel()
     
     var body: some View {
         VStack {
-            if isCompleted {
-                CompleteView(isCompleted: $isCompleted)
-            } else {
-                InputView(isCompleted: $isCompleted)
+            switch viewModel.state {
+            case .input:
+                InputView(viewModel: viewModel)
+            case .loading:
+                ProgressView()
+            case .complete(let message):
+                CompleteView(viewModel: viewModel, message: message)
             }
         }
         .frame(width: 300, height: 300)
@@ -31,8 +29,9 @@ struct MenuBarView: View {
 fileprivate struct InputView: View {
     @State private var titleText = ""
     @State private var urlText = ""
-    @Binding var isCompleted: Bool
     @FocusState private var isFocused: Bool
+    
+    var viewModel: MenuBarViewModel
     
     fileprivate var body: some View {
         VStack {
@@ -63,8 +62,14 @@ fileprivate struct InputView: View {
             
             Button(
                 action: {
-                    CloudService.shared.saveLink(title: titleText, url: urlText)
-                    isCompleted = true
+                    viewModel.saveButtonTapped(title: titleText, url: urlText) { result in
+                        switch result {
+                        case .success(let success):
+                            self.viewModel.changeState(.complete(message: success))
+                        case .failure(let failure):
+                            self.viewModel.changeState(.complete(message: failure.localizedDescription))
+                        }
+                    }
                 },
                 label: {
                     Text("Save")
@@ -78,14 +83,18 @@ fileprivate struct InputView: View {
 }
 
 fileprivate struct CompleteView: View {
-    @Binding var isCompleted: Bool
+    var viewModel: MenuBarViewModel
+    let message: String
     
     fileprivate var body: some View {
         VStack {
+            Text("\(message)")
+                .font(.system(size: 20))
+            
             Button(
-                action: { isCompleted = false },
+                action: { viewModel.changeState(.input) },
                 label: {
-                    Text("Done")
+                    Text("확인")
                 })
         }
     }
