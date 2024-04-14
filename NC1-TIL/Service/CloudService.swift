@@ -15,7 +15,7 @@ class CloudService {
     private let container = CKContainer(identifier: "iCloud.NC1-TIL")
     private let recordType = "Link"
     
-    func saveLink(_ link: Link) {
+    func saveLink(_ link: URLLink) {
         let record = CKRecord(recordType: recordType)
         record["title"] = link.title
         record["url"] = link.url
@@ -33,8 +33,8 @@ class CloudService {
     
     
     
-    func fetchLinks(completion: @escaping (Result<[Link], Error>) -> Void) {
-        var links: [Link] = []
+    func fetchLinks(completion: @escaping (Result<[URLLink], Error>) -> Void) {
+        var links: [URLLink] = []
         let predicate = NSPredicate(value: true)
         //let predicate = NSPredicate(format: "date >= %@", date as NSDate)
         
@@ -67,14 +67,14 @@ class CloudService {
         operation.start()
     }
     
-    func convertLinkFromRecord(from record: CKRecord) -> Link? {
+    func convertLinkFromRecord(from record: CKRecord) -> URLLink? {
         guard let title = record.value(forKey: "title") as? String,
               let url = record.value(forKey: "url") as? String,
               let date = record.value(forKey: "date") as? Date else {
             return nil
         }
         
-        return Link(title: title, url: url, date: date)
+        return URLLink(title: title, url: url, date: date)
     }
     
         

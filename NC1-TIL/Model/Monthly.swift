@@ -10,5 +10,5 @@ import Foundation
 struct Monthly: Hashable {
     var date: Date
     var days: Int
-    var links: [Link]
+    var links: [URLLink]
 }

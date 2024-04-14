@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Link: Equatable, Hashable {
+struct URLLink: Equatable, Hashable {
     var title: String
     var url: String
     var date: Date

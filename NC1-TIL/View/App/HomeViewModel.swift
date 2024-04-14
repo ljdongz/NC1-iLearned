@@ -31,7 +31,7 @@ class HomeViewModel {
     
     /// Link 데이터로 Monthlys 데이터를 만듦
     /// - Parameter links: [Link] 데이터
-    func createMonthlys(_ links: [Link]) {
+    func createMonthlys(_ links: [URLLink]) {
         let calendar = Calendar.current
         
         var currentDate = links[0].date.convertYearAndMonthDate()
@@ -49,8 +49,8 @@ class HomeViewModel {
     /// Link 데이터를 Date별로 그룹화
     /// - Parameter links: [Link] 데이터
     /// - Returns: [Date: [Link]]
-    func groupedLink(_ links: [Link]) -> [Date: [Link]] {
-        var dic: [Date: [Link]] = [:]
+    func groupedLink(_ links: [URLLink]) -> [Date: [URLLink]] {
+        var dic: [Date: [URLLink]] = [:]
         for link in links {
             let date = link.date.convertYearAndMonthDate()
             if dic[date] == nil {

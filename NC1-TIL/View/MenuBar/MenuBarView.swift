@@ -63,7 +63,7 @@ fileprivate struct InputView: View {
             
             Button(
                 action: {
-                    CloudService.shared.saveLink(Link(title: titleText, url: urlText, date: .now))
+                    CloudService.shared.saveLink(URLLink(title: titleText, url: urlText, date: .now))
                     isCompleted = true
                 },
                 label: {

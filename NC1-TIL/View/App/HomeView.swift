@@ -21,7 +21,7 @@ struct HomeView: View {
             }
             
         }
-        .frame(width: 800, height: 700)
+        .frame(width: 800, height: 800)
         .onAppear {
             viewModel.fetchAllLink()
         }
@@ -134,7 +134,7 @@ fileprivate struct ContentsView: View {
 }
 
 fileprivate struct LinkListView: View {
-    var links: [Link]
+    var links: [URLLink]
     
     fileprivate var body: some View {
         TabView {
@@ -153,31 +153,32 @@ fileprivate struct LinkListView: View {
 }
 
 fileprivate struct LinkListCellView: View {
-    var link: Link
+    var link: URLLink
     
     fileprivate var body: some View {
         
         VStack {
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .resizable()
-                        .frame(width: 30, height: 30)
-                    
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .resizable()
+                    .frame(width: 30, height: 30)
+                
+                Link(destination: URL(string: link.url)!, label: {
                     Text(link.title)
                         .lineLimit(1)
-                        .font(.system(size: 18))
+                        .font(.system(size: 15))
                         .padding(.leading, 20)
-                    
-                    Spacer()
-                }
-                .padding(.vertical)
-                .padding(.horizontal, 30)
-                .foregroundStyle(AppColor.dark)
-                .background(AppColor.background)
-                .clipShape(RoundedRectangle(cornerRadius: 50))
-            
-            
+                })
+                
+                Spacer()
+            }
+            .padding(.vertical, 10)
+            .padding(.horizontal, 30)
+            .foregroundStyle(AppColor.dark)
+            .background(AppColor.background)
+            .clipShape(RoundedRectangle(cornerRadius: 50))
         }
+        .padding(.horizontal, 50)
     }
 }
 

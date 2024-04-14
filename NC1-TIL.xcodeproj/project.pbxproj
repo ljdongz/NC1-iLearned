@@ -22,7 +22,7 @@
 		57BE42E12BC7BED7004D3706 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57BE42E02BC7BED7004D3706 /* MenuBarView.swift */; };
 		57BE42E42BC7BF12004D3706 /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57BE42E32BC7BF12004D3706 /* StatusBarController.swift */; };
 		57BE42EB2BC7C204004D3706 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57BE42EA2BC7C204004D3706 /* AppDelegate.swift */; };
-		57BE42ED2BC7CCB4004D3706 /* Link.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57BE42EC2BC7CCB4004D3706 /* Link.swift */; };
+		57BE42ED2BC7CCB4004D3706 /* URLLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57BE42EC2BC7CCB4004D3706 /* URLLink.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,7 +43,7 @@
 		57BE42E02BC7BED7004D3706 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		57BE42E32BC7BF12004D3706 /* StatusBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = "<group>"; };
 		57BE42EA2BC7C204004D3706 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		57BE42EC2BC7CCB4004D3706 /* Link.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Link.swift; sourceTree = "<group>"; };
+		57BE42EC2BC7CCB4004D3706 /* URLLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLLink.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -162,7 +162,7 @@
 		57BE42E82BC7BFD8004D3706 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				57BE42EC2BC7CCB4004D3706 /* Link.swift */,
+				57BE42EC2BC7CCB4004D3706 /* URLLink.swift */,
 				577F1A772BCAC5440014C2F9 /* Monthly.swift */,
 			);
 			path = Model;
@@ -255,7 +255,7 @@
 				57BE42E42BC7BF12004D3706 /* StatusBarController.swift in Sources */,
 				577F1A662BC973290014C2F9 /* NotificationName+Ext.swift in Sources */,
 				57BE42D42BC7BDC5004D3706 /* HomeView.swift in Sources */,
-				57BE42ED2BC7CCB4004D3706 /* Link.swift in Sources */,
+				57BE42ED2BC7CCB4004D3706 /* URLLink.swift in Sources */,
 				57BE42EB2BC7C204004D3706 /* AppDelegate.swift in Sources */,
 				577F1A742BCA58E30014C2F9 /* HomeViewModel.swift in Sources */,
 				57BE42D22BC7BDC5004D3706 /* NC1_TILApp.swift in Sources */,
