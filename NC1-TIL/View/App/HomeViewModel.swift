@@ -10,10 +10,9 @@ import Foundation
 @Observable
 class HomeViewModel {
     var monthlys: [Monthly] = []
-    var isLoading: Bool = true
-    var currentIndex: Int?
+    var isLoading: Bool = false
     var totalContributions: Int = 0
-    
+    var currentMonthly: Monthly?
     
     /// 모든 LInk 데이터를 가져옴
     func fetchAllLink() {
@@ -25,6 +24,10 @@ class HomeViewModel {
                 self.createMonthlys(links)
                 self.totalContributions = links.count
                 self.isLoading = false
+                if self.currentMonthly == nil {
+                    self.scrollToCurrentDate()
+                }
+                
             case .failure(let error):
                 print(error)
             }
@@ -51,13 +54,14 @@ class HomeViewModel {
         let endDate = links[links.count-1].date.convertYearAndMonthDate()
         
         let dic = groupedLink(links)
-        monthlys = []
+        var newMonthlys: [Monthly] = []
         
         while currentDate <= endDate {
-            monthlys.append(Monthly(date: currentDate, days: currentDate.daysInMonth(), links: dic[currentDate] ?? []))
+            newMonthlys.append(Monthly(date: currentDate, days: currentDate.daysInMonth(), links: dic[currentDate] ?? []))
             
             currentDate = calendar.date(byAdding: .month, value: 1, to: currentDate)!
         }
+        monthlys = newMonthlys
     }
     
     /// Link 데이터를 Date별로 그룹화
@@ -77,6 +81,6 @@ class HomeViewModel {
     }
     
     func scrollToCurrentDate() {
-        currentIndex = monthlys.count - 1
+        currentMonthly = monthlys.last
     }
 }

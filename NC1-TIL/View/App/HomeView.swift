@@ -14,26 +14,11 @@ struct HomeView: View {
         ZStack {
             AppColor.background.ignoresSafeArea(.all)
             
-            if viewModel.isLoading {
-                SplashView()
-            } else {
-                MainView(viewModel: viewModel)
-            }
-            
+            MainView(viewModel: viewModel)
         }
         .frame(width: 800, height: 800)
         .onAppear {
             viewModel.fetchAllLink()
-        }
-    }
-}
-
-// MARK: - 로딩 화면
-fileprivate struct SplashView: View {
-    
-    fileprivate var body: some View {
-        VStack {
-            Text("Loading...")
         }
     }
 }
@@ -47,34 +32,55 @@ fileprivate struct MainView: View {
     }
     
     fileprivate var body: some View {
+        ZStack {
+            if !viewModel.monthlys.isEmpty {
+                VStack {
+                    RefreshButton(viewModel: viewModel)
+                    
+                    Text("Today I Learned!")
+                        .font(.system(size: 40, weight: .bold))
+                        .foregroundStyle(AppColor.dark)
+                        .padding(.top, 30)
+                    
+                    
+                    Text("\(viewModel.totalContributions) contributions in the last year")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(AppColor.gray)
+                        .padding(.top, 5)
+                    
+                    Spacer()
+                        .frame(height: 50)
+                    
+        //            Text(String(viewModel.monthlys[viewModel.currentIndex ?? 0].date.currentYear()))
+                    Text(String(viewModel.currentMonthly!.date.currentYear()))
+                        .font(.system(size: 40, weight: .semibold))
+                        .foregroundStyle(AppColor.dark)
+                    
+                    MonthlyView(viewModel: viewModel)
+                }
+                
+            }
+            
+            if viewModel.isLoading {
+                LoadingView()
+            }
+        }
         
+    }
+}
+
+fileprivate struct LoadingView: View {
+    fileprivate var body: some View {
         VStack {
-            RefreshButton(viewModel: viewModel)
-            
-            Text("Today I Learned!")
-                .font(.system(size: 40, weight: .bold))
-                .foregroundStyle(AppColor.dark)
-                .padding(.top, 30)
-            
-            Text("\(viewModel.totalContributions) contributions in the last year")
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(AppColor.gray)
-                .padding(.top, 5)
-            
             Spacer()
-                .frame(height: 50)
-            
-            Text(String(viewModel.monthlys[viewModel.currentIndex ?? 0].date.currentYear()))
-                .font(.system(size: 40, weight: .semibold))
-                .foregroundStyle(AppColor.dark)
-            
-            MonthlyView(viewModel: viewModel)
-            
-            
+            HStack {
+                Spacer()
+                ProgressView()
+                Spacer()
+            }
+            Spacer()
         }
-        .onAppear {
-            viewModel.scrollToCurrentDate()
-        }
+        .background(AppColor.dark.opacity(0.5))
     }
 }
 
@@ -108,13 +114,14 @@ fileprivate struct MonthlyView: View {
                 ForEach(Array(viewModel.monthlys.enumerated()), id: \.1) { idx, monthly in
                     ContentsView(viewModel: viewModel, monthly: monthly)
                         .containerRelativeFrame(.horizontal)
-                        .id(idx)
+                        //.id(idx)
                 }
             }
             .scrollTargetLayout()
         }
+        .scrollPosition(id: $viewModel.currentMonthly, anchor: .center)
         .scrollTargetBehavior(.viewAligned)
-        .scrollPosition(id: $viewModel.currentIndex, anchor: .center)
+        
     }
 }
 
@@ -128,27 +135,29 @@ fileprivate struct ContentsView: View {
             AppColor.dark
             
             VStack {
-                HStack {
+                ZStack {
                     HStack {
-                        Circle()
-                            .frame(width: 15, height: 15)
-                            .foregroundStyle(AppColor.red)
-                        Circle()
-                            .frame(width: 15, height: 15)
-                            .foregroundStyle(AppColor.yellow)
-                        Circle()
-                            .frame(width: 15, height: 15)
-                            .foregroundStyle(AppColor.green)
+                        HStack {
+                            Circle()
+                                .frame(width: 15, height: 15)
+                                .foregroundStyle(AppColor.red)
+                            Circle()
+                                .frame(width: 15, height: 15)
+                                .foregroundStyle(AppColor.yellow)
+                            Circle()
+                                .frame(width: 15, height: 15)
+                                .foregroundStyle(AppColor.green)
+                        }
+                        
+                        Spacer()
                     }
+                    .padding()
+                    .background(AppColor.gray)
                     
-                    Spacer()
+                    Text("\(monthly.date.currentMonth())월")
+                        .font(.system(size: 20))
+                        .foregroundStyle(AppColor.background)
                 }
-                .padding()
-                .background(AppColor.gray)
-                
-                Text("\(monthly.date.currentMonth())월")
-                    .font(.system(size: 20))
-                    .foregroundStyle(AppColor.background)
                 
                 Spacer()
                 
@@ -167,15 +176,16 @@ fileprivate struct LinkListView: View {
     
     fileprivate var body: some View {
         TabView {
-            
-            ForEach(links.chunked(into: 3), id: \.self) { chunk in
+            ForEach(Array(links.reversed().chunked(into: 3).enumerated()), id: \.1) { idx, chunk in
                 VStack {
                     ForEach(chunk, id: \.self) { link in
                         LinkListCellView(viewModel: viewModel, link: link)
                             
                     }
                 }
-                
+                .tabItem {
+                    Text("\(idx + 1) page")
+                }
             }
         }
     }
@@ -183,6 +193,8 @@ fileprivate struct LinkListView: View {
 
 // MARK: - 링크 리스트 셀 화면
 fileprivate struct LinkListCellView: View {
+    @State private var isOnHover: Bool = false
+    
     var viewModel: HomeViewModel
     var link: URLLink
     
@@ -200,8 +212,12 @@ fileprivate struct LinkListCellView: View {
                         .lineLimit(1)
                         .font(.system(size: 15))
                         .padding(.leading, 20)
-                        .foregroundStyle(AppColor.dark)
+                        .foregroundStyle(isOnHover ? .blue : AppColor.dark)
+                        .underline(isOnHover ? true : false)
                 })
+                .onHover { bool in
+                    self.isOnHover = bool
+                }
                 
                 Spacer()
                 

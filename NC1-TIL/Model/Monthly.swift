@@ -12,3 +12,4 @@ struct Monthly: Hashable {
     var days: Int
     var links: [URLLink]
 }
+
