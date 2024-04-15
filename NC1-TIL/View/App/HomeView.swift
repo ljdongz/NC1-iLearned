@@ -51,12 +51,21 @@ fileprivate struct MainView: View {
                     Spacer()
                         .frame(height: 50)
                     
-        //            Text(String(viewModel.monthlys[viewModel.currentIndex ?? 0].date.currentYear()))
-                    Text(String(viewModel.currentMonthly!.date.currentYear()))
-                        .font(.system(size: 40, weight: .semibold))
-                        .foregroundStyle(AppColor.dark)
+                    //            Text(String(viewModel.monthlys[viewModel.currentIndex ?? 0].date.currentYear()))
+                    
+                    HStack {
+                        Text(String(viewModel.currentMonthly?.date.currentYear() ?? 0) + "년")
+                        
+                        Text("\(viewModel.currentMonthly?.date.currentMonth() ?? 0)월")
+                    }
+                    .font(.system(size: 40, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(AppColor.dark)
+                    
                     
                     MonthlyView(viewModel: viewModel)
+                }
+                .onAppear {
+                    viewModel.scrollToCurrentDate()
                 }
                 
             }
@@ -97,7 +106,7 @@ fileprivate struct RefreshButton: View {
                 },
                 label: {
                     Image(systemName: "arrow.clockwise")
-            })
+                })
         }
         .font(.system(size: 14))
         .foregroundStyle(AppColor.gray)
@@ -114,7 +123,7 @@ fileprivate struct MonthlyView: View {
                 ForEach(Array(viewModel.monthlys.enumerated()), id: \.1) { idx, monthly in
                     ContentsView(viewModel: viewModel, monthly: monthly)
                         .containerRelativeFrame(.horizontal)
-                        //.id(idx)
+                    //.id(idx)
                 }
             }
             .scrollTargetLayout()
@@ -135,29 +144,26 @@ fileprivate struct ContentsView: View {
             AppColor.dark
             
             VStack {
-                ZStack {
-                    HStack {
+                
+                HStack {
+                    ZStack {
                         HStack {
                             Circle()
-                                .frame(width: 15, height: 15)
+                                .frame(width: 10, height: 10)
                                 .foregroundStyle(AppColor.red)
                             Circle()
-                                .frame(width: 15, height: 15)
+                                .frame(width: 10, height: 10)
                                 .foregroundStyle(AppColor.yellow)
                             Circle()
-                                .frame(width: 15, height: 15)
+                                .frame(width: 10, height: 10)
                                 .foregroundStyle(AppColor.green)
+                            Spacer()
                         }
-                        
-                        Spacer()
                     }
-                    .padding()
-                    .background(AppColor.gray)
-                    
-                    Text("\(monthly.date.currentMonth())월")
-                        .font(.system(size: 20))
-                        .foregroundStyle(AppColor.background)
                 }
+                .padding(.horizontal)
+                .padding(.vertical, 5)
+                .background(AppColor.gray)
                 
                 Spacer()
                 
@@ -175,17 +181,22 @@ fileprivate struct LinkListView: View {
     var links: [URLLink]
     
     fileprivate var body: some View {
-        TabView {
-            ForEach(Array(links.reversed().chunked(into: 3).enumerated()), id: \.1) { idx, chunk in
-                VStack {
-                    ForEach(chunk, id: \.self) { link in
-                        LinkListCellView(viewModel: viewModel, link: link)
-                            
-                    }
-                }
-                .tabItem {
-                    Text("\(idx + 1) page")
-                }
+        //        TabView {
+        //            ForEach(Array(links.reversed().chunked(into: 3).enumerated()), id: \.1) { idx, chunk in
+        //                VStack {
+        //                    ForEach(chunk, id: \.self) { link in
+        //                        LinkListCellView(viewModel: viewModel, link: link)
+        //
+        //                    }
+        //                }
+        //                .tabItem {
+        //                    Text("\(idx + 1) page")
+        //                }
+        //            }
+        //        }
+        ScrollView {
+            ForEach(Array(links.reversed().enumerated()), id: \.1) { idx, link in
+                LinkListCellView(viewModel: viewModel, link: link)
             }
         }
     }
@@ -204,8 +215,8 @@ fileprivate struct LinkListCellView: View {
             HStack {
                 Image(systemName: "magnifyingglass")
                     .resizable()
-                    .frame(width: 30, height: 30)
-                    .foregroundStyle(AppColor.dark)
+                    .frame(width: 15, height: 15)
+                    .foregroundStyle(AppColor.gray)
                 
                 Link(destination: URL(string: link.url)!, label: {
                     Text(link.title)
@@ -220,17 +231,13 @@ fileprivate struct LinkListCellView: View {
                 }
                 
                 Spacer()
-                
-                Button(
-                    action: {
-                        viewModel.deleteLink(link)
-                    },
-                    label: {
-                        Text("삭제")
-                            .font(.system(size: 14))
-                            .foregroundStyle(AppColor.red)
-                })
-                    
+
+                Button {
+                    viewModel.deleteLink(link)
+                } label: {
+                    Text("삭제")
+                }
+
             }
             .padding(.vertical, 10)
             .padding(.horizontal, 30)
@@ -242,7 +249,7 @@ fileprivate struct LinkListCellView: View {
 }
 
 #Preview {
-        HomeView()
+    HomeView()
 }
 
 

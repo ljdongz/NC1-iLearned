@@ -23,25 +23,27 @@ class HomeViewModel {
             case .success(let links):
                 self.createMonthlys(links)
                 self.totalContributions = links.count
-                self.isLoading = false
-                if self.currentMonthly == nil {
-                    self.scrollToCurrentDate()
-                }
-                
             case .failure(let error):
                 print(error)
             }
+            
+            self.isLoading = false
         }
     }
     
     func deleteLink(_ link: URLLink) {
+        isLoading = true
+        
         CloudService.shared.deleteLink(link.recordID) { result in
             switch result {
             case .success(let success):
                 print(success)
+                self.deleteLinkFromMonthly(link)
             case .failure(let failure):
                 print(failure.localizedDescription)
             }
+            
+            self.isLoading = false
         }
     }
     
@@ -78,6 +80,16 @@ class HomeViewModel {
             }
         }
         return dic
+    }
+    
+    private func deleteLinkFromMonthly(_ link: URLLink) {
+        guard let monthly = currentMonthly,
+              let monthlyIndex = monthlys.firstIndex(where: { $0.date == monthly.date }),
+              let linkIndex = monthlys[monthlyIndex].links.firstIndex(where: { $0.date == link.date }) 
+        else { return }
+        
+        monthlys[monthlyIndex].links.remove(at: linkIndex)
+        print(monthlys.count)
     }
     
     func scrollToCurrentDate() {
