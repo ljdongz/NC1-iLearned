@@ -36,16 +36,16 @@ class HomeViewModel {
         
         CloudService.shared.deleteLink(link.recordID) { result in
             switch result {
-            case .success(let success):
-                self.deleteLinkFromMonthly(link)
+            case .success:
+                self.fetchAllLink()
             case .failure(let failure):
                 print(failure.localizedDescription)
+                self.isLoading = false
             }
-            
-            self.isLoading = false
         }
     }
     
+    // TODO: 등록한 달만 표시하도록 수정
     /// Link 데이터로 Monthlys 데이터를 만듦
     /// - Parameter links: [Link] 데이터
     func createMonthlys(_ links: [URLLink]) {
@@ -79,43 +79,6 @@ class HomeViewModel {
             }
         }
         return dic
-    }
-    
-    private func deleteLinkFromMonthly(_ link: URLLink) {
-//        guard let monthly = currentMonthly,
-//              let monthlyIndex = monthlys.firstIndex(where: { $0.date == monthly.date }),
-//              let linkIndex = monthlys[monthlyIndex].links.firstIndex(where: { $0.date == link.date }) 
-//        else { print("return"); return }
-//        
-//        
-//        
-//        for mIdx in (monthlyIndex + 1)..<monthlys.count {
-//            for lIdx in monthlys[mIdx].links.indices {
-//                monthlys[mIdx].links[lIdx].id -= 1
-//            }
-//        }
-//        
-//        monthlys[monthlyIndex].links.remove(at: linkIndex)
-        
-        var monthlyIdx = 0
-        var linkIdx = 0
-        
-        for i in monthlys.indices {
-            for j in monthlys[i].links.indices {
-                if monthlys[i].links[j].id == link.id {
-                    monthlyIdx = i
-                    linkIdx = j
-                }
-            }
-        }
-        
-        for i in (monthlyIdx + 1)..<monthlys.count {
-            for j in monthlys[i].links.indices {
-                monthlys[i].links[j].id -= 1
-            }
-        }
-        
-        monthlys[monthlyIdx].links.remove(at: linkIdx)
     }
     
     func scrollToCurrentDate() {

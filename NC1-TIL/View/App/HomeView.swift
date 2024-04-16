@@ -219,6 +219,8 @@ fileprivate struct CommandInputView: View {
                     }
                     .focused($isFocused)
             }
+            
+            Spacer()
         }
         .font(.system(size: 12, weight: .medium))
         
