@@ -56,7 +56,7 @@ fileprivate struct RefreshButton: View {
             .buttonStyle(CustomButtonStyle())
             
         }
-        .font(.system(size: 12))
+        .font(.custom(AppFont.main, size: 12))
     }
 }
 
@@ -86,31 +86,29 @@ fileprivate struct MonthlyView: View {
                     .foregroundStyle(AppColor.blue)
                     .overlay {
                         Text("\(String(monthly.date.currentYear())) YEAR")
-                            .font(.system(size: 12, weight: .semibold))
                     }
                 Rectangle()
                     .frame(width: 100, height: 20)
                     .foregroundStyle(AppColor.green)
                     .overlay {
                         Text("\(Month(rawValue: monthly.date.currentMonth())!.description)")
-                            .font(.system(size: 12, weight: .semibold))
                     }
                 Rectangle()
                     .frame(width: 100, height: 20)
                     .foregroundStyle(AppColor.yellow)
                     .overlay {
                         Text("+\(monthly.days.filter { $0 != 0 }.count) Days")
-                            .font(.system(size: 12, weight: .semibold))
                     }
                 Rectangle()
                     .frame(width: 100, height: 20)
                     .foregroundStyle(AppColor.red)
                     .overlay {
                         Text("+\(monthly.links.count) Learned")
-                            .font(.system(size: 12, weight: .semibold))
                     }
                 Spacer()
             }
+            .font(.custom(AppFont.main, size: 15))
+            .fontWeight(.bold)
             
             HStack(spacing: 1.5) {
                 ForEach(Array(monthly.days.enumerated()), id: \.0) { idx, count in
@@ -151,7 +149,7 @@ fileprivate struct LinkView: View {
             HStack {
                 Link(destination: URL(string: link.url)!, label: {
                     Text("[\(link.id)\t]")
-//                        .frame(width: 30, alignment: .leading)
+
                     Text(link.title)
                         .underline(isLinkButtonHover)
                         .tint(AppColor.textGray)
@@ -196,7 +194,7 @@ fileprivate struct LinkView: View {
                     Text("\(link.date.convertToString())")
                 }
         }
-        .font(.system(size: 12))
+        .font(.custom(AppFont.main, size: 12))
         .foregroundStyle(AppColor.textGray)
     }
 }
@@ -232,8 +230,8 @@ fileprivate struct CommandInputView: View {
             
             Spacer()
         }
-        .font(.system(size: 12, weight: .medium))
-        
+        .font(.custom(AppFont.main, size: 13))
+        .fontWeight(.medium)
     }
 }
 
