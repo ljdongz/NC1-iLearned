@@ -13,7 +13,7 @@ class HomeViewModel {
     var isLoading: Bool = false
     var totalContributions: Int = 0
     
-    /// 모든 LInk 데이터를 가져옴
+    /// 모든 Link 데이터를 가져옴
     func fetchAllLink() {
         isLoading = true
         
@@ -30,6 +30,9 @@ class HomeViewModel {
         }
     }
     
+    
+    /// 특정 Link 데이터 삭제
+    /// - Parameter link: 삭제할 Link 데이터
     func deleteLink(_ link: URLLink) {
         isLoading = true
         
@@ -58,7 +61,8 @@ class HomeViewModel {
         var newMonthlys: [Monthly] = []
         
         for (key, value) in sortedDic {
-            newMonthlys.append(Monthly(date: key, days: key.daysInMonth(), links: value))
+            let days = self.assignLinkToDays(days: key.daysInMonth(), links: value)
+            newMonthlys.append(Monthly(date: key, days: days, links: value))
         }
         
         monthlys = newMonthlys
@@ -80,4 +84,13 @@ class HomeViewModel {
         return dic
     }
     
+    func assignLinkToDays(days: Int, links: [URLLink]) -> [Int] {
+        var array = Array(repeating: 0, count: days)
+        
+        for link in links {
+            array[link.date.currentDay()-1] += 1
+        }
+        
+        return array
+    }
 }

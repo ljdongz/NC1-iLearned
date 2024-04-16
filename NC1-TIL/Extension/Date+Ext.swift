@@ -62,6 +62,10 @@ extension Date {
         return String(Calendar.current.component(.month, from: self))
     }
     
+    func currentDay() -> Int {
+        return Calendar.current.component(.day, from: self)
+    }
+    
     func convertToString() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "MM월 dd일 hh:mm"

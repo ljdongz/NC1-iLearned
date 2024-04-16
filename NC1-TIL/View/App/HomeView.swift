@@ -99,7 +99,7 @@ fileprivate struct MonthlyView: View {
                     .frame(width: 100, height: 20)
                     .foregroundStyle(AppColor.yellow)
                     .overlay {
-                        Text("+3 Days")
+                        Text("+\(monthly.days.filter { $0 != 0 }.count) Days")
                             .font(.system(size: 12, weight: .semibold))
                     }
                 Rectangle()
@@ -111,6 +111,21 @@ fileprivate struct MonthlyView: View {
                     }
                 Spacer()
             }
+            
+            HStack(spacing: 1.5) {
+                ForEach(Array(monthly.days.enumerated()), id: \.0) { idx, count in
+                    RoundedRectangle(cornerRadius: 2)
+                        .frame(width: 10, height: 10)
+                        .foregroundStyle(count != 0 ? AppColor.green : AppColor.dark)
+                    
+                    if (idx + 1) % 7 == 0 {
+                        Spacer().frame(width: 3)
+                    }
+                }
+                
+                Spacer()
+            }
+            .padding(.horizontal, 5)
 
             LazyVStack {
                 ForEach(monthly.links, id: \.self) { link in
@@ -187,13 +202,6 @@ fileprivate struct LinkView: View {
 }
 
 
-fileprivate struct CustomButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .foregroundColor(configuration.isPressed ? AppColor.gray : AppColor.textGray)
-    }
-}
-
 // MARK: - 커멘트 입력 창
 fileprivate struct CommandInputView: View {
     let viewModel: HomeViewModel
@@ -229,13 +237,10 @@ fileprivate struct CommandInputView: View {
     }
 }
 
-struct TestView: View {
-    
-    var body: some View {
-        VStack {
-            
-        }
-        
+fileprivate struct CustomButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundColor(configuration.isPressed ? AppColor.gray : AppColor.textGray)
     }
 }
 
