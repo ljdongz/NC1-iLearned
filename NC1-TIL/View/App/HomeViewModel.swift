@@ -12,7 +12,6 @@ class HomeViewModel {
     var monthlys: [Monthly] = []
     var isLoading: Bool = false
     var totalContributions: Int = 0
-    var currentMonthly: Monthly?
     
     /// 모든 LInk 데이터를 가져옴
     func fetchAllLink() {
@@ -45,7 +44,6 @@ class HomeViewModel {
         }
     }
     
-    // TODO: 등록한 달만 표시하도록 수정
     /// Link 데이터로 Monthlys 데이터를 만듦
     /// - Parameter links: [Link] 데이터
     func createMonthlys(_ links: [URLLink]) {
@@ -55,13 +53,14 @@ class HomeViewModel {
         let endDate = links[links.count-1].date.convertYearAndMonthDate()
         
         let dic = groupedLink(links)
+        let sortedDic = dic.sorted { $0.key < $1.key }
+        
         var newMonthlys: [Monthly] = []
         
-        while currentDate <= endDate {
-            newMonthlys.append(Monthly(date: currentDate, days: currentDate.daysInMonth(), links: dic[currentDate] ?? []))
-            
-            currentDate = calendar.date(byAdding: .month, value: 1, to: currentDate)!
+        for (key, value) in sortedDic {
+            newMonthlys.append(Monthly(date: key, days: key.daysInMonth(), links: value))
         }
+        
         monthlys = newMonthlys
     }
     
@@ -81,7 +80,4 @@ class HomeViewModel {
         return dic
     }
     
-    func scrollToCurrentDate() {
-        currentMonthly = monthlys.last
-    }
 }

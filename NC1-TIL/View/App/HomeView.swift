@@ -112,9 +112,11 @@ fileprivate struct MonthlyView: View {
                 Spacer()
             }
 
-            ForEach(monthly.links, id: \.self) { link in
-                LinkView(viewModel: viewModel, link: link)
-                    .padding(.horizontal, 5)
+            LazyVStack {
+                ForEach(monthly.links, id: \.self) { link in
+                    LinkView(viewModel: viewModel, link: link)
+                        .padding(.horizontal, 5)
+                }
             }
         }
     }
