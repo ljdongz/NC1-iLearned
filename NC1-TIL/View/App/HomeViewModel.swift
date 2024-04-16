@@ -21,7 +21,6 @@ class HomeViewModel {
         CloudService.shared.fetchLinks { result in
             switch result {
             case .success(let links):
-                print(links)
                 self.createMonthlys(links)
                 self.totalContributions = links.count
             case .failure(let error):
@@ -38,7 +37,6 @@ class HomeViewModel {
         CloudService.shared.deleteLink(link.recordID) { result in
             switch result {
             case .success(let success):
-                print(success)
                 self.deleteLinkFromMonthly(link)
             case .failure(let failure):
                 print(failure.localizedDescription)
@@ -84,13 +82,40 @@ class HomeViewModel {
     }
     
     private func deleteLinkFromMonthly(_ link: URLLink) {
-        guard let monthly = currentMonthly,
-              let monthlyIndex = monthlys.firstIndex(where: { $0.date == monthly.date }),
-              let linkIndex = monthlys[monthlyIndex].links.firstIndex(where: { $0.date == link.date }) 
-        else { return }
+//        guard let monthly = currentMonthly,
+//              let monthlyIndex = monthlys.firstIndex(where: { $0.date == monthly.date }),
+//              let linkIndex = monthlys[monthlyIndex].links.firstIndex(where: { $0.date == link.date }) 
+//        else { print("return"); return }
+//        
+//        
+//        
+//        for mIdx in (monthlyIndex + 1)..<monthlys.count {
+//            for lIdx in monthlys[mIdx].links.indices {
+//                monthlys[mIdx].links[lIdx].id -= 1
+//            }
+//        }
+//        
+//        monthlys[monthlyIndex].links.remove(at: linkIndex)
         
-        monthlys[monthlyIndex].links.remove(at: linkIndex)
-        print(monthlys.count)
+        var monthlyIdx = 0
+        var linkIdx = 0
+        
+        for i in monthlys.indices {
+            for j in monthlys[i].links.indices {
+                if monthlys[i].links[j].id == link.id {
+                    monthlyIdx = i
+                    linkIdx = j
+                }
+            }
+        }
+        
+        for i in (monthlyIdx + 1)..<monthlys.count {
+            for j in monthlys[i].links.indices {
+                monthlys[i].links[j].id -= 1
+            }
+        }
+        
+        monthlys[monthlyIdx].links.remove(at: linkIdx)
     }
     
     func scrollToCurrentDate() {

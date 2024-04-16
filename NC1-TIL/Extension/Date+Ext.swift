@@ -18,7 +18,8 @@ extension Date {
         components.year = calendar.component(.year, from: self)
         components.month = calendar.component(.month, from: self)
         components.day = calendar.component(.day, from: self)
-        components.hour = 9
+        components.hour = calendar.component(.hour, from: self) + 9
+        components.minute = calendar.component(.minute, from: self)
 
         return calendar.date(from: components)!
     }
@@ -53,12 +54,12 @@ extension Date {
         return calendar.date(from: dateComponents)!
     }
     
-    func currentYear() -> Int {
-        return Calendar.current.component(.year, from: self)
+    func currentYear() -> String {
+        return String(Calendar.current.component(.year, from: self))
     }
     
-    func currentMonth() -> Int {
-        return Calendar.current.component(.month, from: self)
+    func currentMonth() -> String {
+        return String(Calendar.current.component(.month, from: self))
     }
     
     func convertToString() -> String {

@@ -85,7 +85,7 @@ fileprivate struct MonthlyView: View {
                     .frame(width: 100, height: 20)
                     .foregroundStyle(AppColor.blue)
                     .overlay {
-                        Text("\(String(monthly.date.currentYear()))년")
+                        Text("\(monthly.date.currentYear())년")
                             .font(.system(size: 12, weight: .semibold))
                     }
                 Rectangle()
@@ -124,7 +124,10 @@ fileprivate struct MonthlyView: View {
 fileprivate struct LinkView: View {
     let viewModel: HomeViewModel
     let link: URLLink
-    @State private var isHover: Bool = false
+    
+    @State private var isLinkButtonHover: Bool = false
+    @State private var isDeleteButtonHover: Bool = false
+    @State private var isEditButtonHover: Bool = false
     
     fileprivate var body: some View {
         HStack {
@@ -133,12 +136,12 @@ fileprivate struct LinkView: View {
                     Text("\(link.id).")
                         .frame(width: 30, alignment: .leading)
                     Text(link.title)
-                        .underline(isHover)
+                        .underline(isLinkButtonHover)
                         .tint(AppColor.textGray)
                 })
                 
                 
-                if isHover {
+                if isLinkButtonHover {
                     HStack {
                         Button(action: {
                             
@@ -147,22 +150,26 @@ fileprivate struct LinkView: View {
                                 .resizable()
                                 .frame(width: 10, height: 10)
                         })
+                        .onHover { isEditButtonHover = $0 }
+
                         
                         Button(action: {
-                            
+                            viewModel.deleteLink(link)
                         }, label: {
                             Image(systemName: "trash")
                                 .resizable()
                                 .frame(width: 10, height: 10)
                         })
+                        .onHover { isDeleteButtonHover = $0 }
+                        
+                        
                     }
                     .buttonStyle(PlainButtonStyle())
-                    
                 }
                 
                 Spacer()
             }
-            .onHover { isHover = $0 }
+            .onHover { isLinkButtonHover = $0 }
             
             
             Rectangle()
