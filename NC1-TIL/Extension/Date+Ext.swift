@@ -63,7 +63,7 @@ extension Date {
     
     func convertToString() -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "M월 dd일 hh:mm"
+        formatter.dateFormat = "MM월 dd일 hh:mm"
         return formatter.string(from: self)
     }
 }

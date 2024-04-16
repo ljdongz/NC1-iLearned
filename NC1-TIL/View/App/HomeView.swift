@@ -14,85 +14,29 @@ struct HomeView: View {
         ZStack {
             AppColor.background.ignoresSafeArea(.all)
             
-            MainView(viewModel: viewModel)
+            VStack {
+                HStack {
+                    Spacer()
+                    RefreshButton(viewModel: viewModel)
+                }
+                .padding(15)
+                
+                MainScrollView(viewModel: viewModel)
+                
+                CommandInputView(viewModel: viewModel)
+                    .padding(.horizontal)
+                    .padding(.vertical, 5)
+            }
+            
         }
-        .frame(width: 800, height: 800)
+        .frame(width: 600, height: 450)
         .onAppear {
             viewModel.fetchAllLink()
         }
     }
 }
 
-// MARK: - 메인 화면
-fileprivate struct MainView: View {
-    @Bindable private var viewModel: HomeViewModel
-    
-    init(viewModel: HomeViewModel) {
-        self.viewModel = viewModel
-    }
-    
-    fileprivate var body: some View {
-        ZStack {
-            if !viewModel.monthlys.isEmpty {
-                VStack {
-                    RefreshButton(viewModel: viewModel)
-                    
-                    Text("Today I Learned!")
-                        .font(.system(size: 40, weight: .bold))
-                        .foregroundStyle(AppColor.dark)
-                        .padding(.top, 30)
-                    
-                    
-                    Text("\(viewModel.totalContributions) contributions in the last year")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(AppColor.gray)
-                        .padding(.top, 5)
-                    
-                    Spacer()
-                        .frame(height: 50)
-                    
-                    //            Text(String(viewModel.monthlys[viewModel.currentIndex ?? 0].date.currentYear()))
-                    
-                    HStack {
-                        Text(String(viewModel.currentMonthly?.date.currentYear() ?? 0) + "년")
-                        
-                        Text("\(viewModel.currentMonthly?.date.currentMonth() ?? 0)월")
-                    }
-                    .font(.system(size: 40, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(AppColor.dark)
-                    
-                    
-                    MonthlyView(viewModel: viewModel)
-                }
-                .onAppear {
-                    viewModel.scrollToCurrentDate()
-                }
-                
-            }
-            
-            if viewModel.isLoading {
-                LoadingView()
-            }
-        }
-        
-    }
-}
-
-fileprivate struct LoadingView: View {
-    fileprivate var body: some View {
-        VStack {
-            Spacer()
-            HStack {
-                Spacer()
-                ProgressView()
-                Spacer()
-            }
-            Spacer()
-        }
-        .background(AppColor.dark.opacity(0.5))
-    }
-}
-
+// MARK: - 새로고침 버튼
 fileprivate struct RefreshButton: View {
     var viewModel: HomeViewModel
     
@@ -100,156 +44,194 @@ fileprivate struct RefreshButton: View {
         
         HStack {
             Text("최근 업데이트: \(Date().convertToString())")
+                .foregroundStyle(AppColor.textGray)
             Button(
                 action: {
                     viewModel.fetchAllLink()
                 },
                 label: {
                     Image(systemName: "arrow.clockwise")
-                })
+                }
+            )
+            .buttonStyle(CustomButtonStyle())
+            
         }
-        .font(.system(size: 14))
-        .foregroundStyle(AppColor.gray)
+        .font(.system(size: 12))
+    }
+}
+
+// MARK: - 메인 스크롤 화면
+fileprivate struct MainScrollView: View {
+    let viewModel: HomeViewModel
+    
+    fileprivate var body: some View {
+        ScrollView {
+            ForEach(viewModel.monthlys, id: \.self) { monthly in
+                MonthlyView(viewModel: viewModel, monthly: monthly)
+            }
+        }
     }
 }
 
 // MARK: - 월별 화면
 fileprivate struct MonthlyView: View {
-    @Bindable var viewModel: HomeViewModel
+    let viewModel: HomeViewModel
+    let monthly: Monthly
     
     fileprivate var body: some View {
-        ScrollView(.horizontal) {
-            LazyHStack(spacing: 30) {
-                ForEach(Array(viewModel.monthlys.enumerated()), id: \.1) { idx, monthly in
-                    ContentsView(viewModel: viewModel, monthly: monthly)
-                        .containerRelativeFrame(.horizontal)
-                    //.id(idx)
-                }
+        VStack {
+            HStack(spacing: 0) {
+                Rectangle()
+                    .frame(width: 100, height: 20)
+                    .foregroundStyle(AppColor.blue)
+                    .overlay {
+                        Text("\(String(monthly.date.currentYear()))년")
+                            .font(.system(size: 12, weight: .semibold))
+                    }
+                Rectangle()
+                    .frame(width: 100, height: 20)
+                    .foregroundStyle(AppColor.green)
+                    .overlay {
+                        Text("\(monthly.date.currentMonth())월")
+                            .font(.system(size: 12, weight: .semibold))
+                    }
+                Rectangle()
+                    .frame(width: 100, height: 20)
+                    .foregroundStyle(AppColor.yellow)
+                    .overlay {
+                        Text("+3 Days")
+                            .font(.system(size: 12, weight: .semibold))
+                    }
+                Rectangle()
+                    .frame(width: 100, height: 20)
+                    .foregroundStyle(AppColor.red)
+                    .overlay {
+                        Text("+\(monthly.links.count) Learned")
+                            .font(.system(size: 12, weight: .semibold))
+                    }
+                Spacer()
             }
-            .scrollTargetLayout()
+
+            ForEach(monthly.links, id: \.self) { link in
+                LinkView(viewModel: viewModel, link: link)
+                    .padding(.horizontal, 5)
+            }
         }
-        .scrollPosition(id: $viewModel.currentMonthly, anchor: .center)
-        .scrollTargetBehavior(.viewAligned)
-        
     }
 }
 
-// MARK: - 월별 컨텐츠 화면
-fileprivate struct ContentsView: View {
-    var viewModel: HomeViewModel
-    var monthly: Monthly
+// MARK: - 링크 화면
+fileprivate struct LinkView: View {
+    let viewModel: HomeViewModel
+    let link: URLLink
+    @State private var isHover: Bool = false
     
     fileprivate var body: some View {
-        ZStack {
-            AppColor.dark
-            
-            VStack {
+        HStack {
+            HStack {
+                Link(destination: URL(string: link.url)!, label: {
+                    Text("\(link.id).")
+                        .frame(width: 30, alignment: .leading)
+                    Text(link.title)
+                        .underline(isHover)
+                        .tint(AppColor.textGray)
+                })
                 
-                HStack {
-                    ZStack {
-                        HStack {
-                            Circle()
+                
+                if isHover {
+                    HStack {
+                        Button(action: {
+                            
+                        }, label: {
+                            Image(systemName: "pencil")
+                                .resizable()
                                 .frame(width: 10, height: 10)
-                                .foregroundStyle(AppColor.red)
-                            Circle()
+                        })
+                        
+                        Button(action: {
+                            
+                        }, label: {
+                            Image(systemName: "trash")
+                                .resizable()
                                 .frame(width: 10, height: 10)
-                                .foregroundStyle(AppColor.yellow)
-                            Circle()
-                                .frame(width: 10, height: 10)
-                                .foregroundStyle(AppColor.green)
-                            Spacer()
-                        }
+                        })
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    
+                }
+                
+                Spacer()
+            }
+            .onHover { isHover = $0 }
+            
+            
+            Rectangle()
+                .frame(width: 100, height: 16)
+                .foregroundStyle(AppColor.gray)
+                .overlay {
+                    Text("\(link.date.convertToString())")
+                }
+        }
+        .font(.system(size: 12))
+        .foregroundStyle(AppColor.textGray)
+    }
+}
+
+
+fileprivate struct CustomButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundColor(configuration.isPressed ? AppColor.gray : AppColor.textGray)
+    }
+}
+
+// MARK: - 커멘트 입력 창
+fileprivate struct CommandInputView: View {
+    let viewModel: HomeViewModel
+    @State private var text: String = ""
+    @FocusState private var isFocused: Bool
+    
+    fileprivate var body: some View {
+        HStack {
+            if viewModel.isLoading {
+                VStack(alignment: .leading) {
+                    HStack {
+                        Text("Loading...")
+                        
+                        ProgressView()
+                            .frame(width: 12, height: 12)
+                            .scaleEffect(0.4, anchor: .center)
                     }
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 5)
-                .background(AppColor.gray)
-                
-                Spacer()
-                
-                LinkListView(viewModel: viewModel, links: monthly.links)
+            } else {
+                TextField("명령어 입력 창", text: $text)
+                    .textFieldStyle(.plain)
+                    .onSubmit {
+                        print(text)
+                        text = ""
+                    }
+                    .focused($isFocused)
             }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .padding(.horizontal, 50)
-    }
-}
-
-// MARK: - 링크 리스트 화면
-fileprivate struct LinkListView: View {
-    var viewModel: HomeViewModel
-    var links: [URLLink]
-    
-    fileprivate var body: some View {
-        //        TabView {
-        //            ForEach(Array(links.reversed().chunked(into: 3).enumerated()), id: \.1) { idx, chunk in
-        //                VStack {
-        //                    ForEach(chunk, id: \.self) { link in
-        //                        LinkListCellView(viewModel: viewModel, link: link)
-        //
-        //                    }
-        //                }
-        //                .tabItem {
-        //                    Text("\(idx + 1) page")
-        //                }
-        //            }
-        //        }
-        ScrollView {
-            ForEach(Array(links.reversed().enumerated()), id: \.1) { idx, link in
-                LinkListCellView(viewModel: viewModel, link: link)
-            }
-        }
-    }
-}
-
-// MARK: - 링크 리스트 셀 화면
-fileprivate struct LinkListCellView: View {
-    @State private var isOnHover: Bool = false
-    
-    var viewModel: HomeViewModel
-    var link: URLLink
-    
-    fileprivate var body: some View {
+        .font(.system(size: 12, weight: .medium))
         
+    }
+}
+
+struct TestView: View {
+    
+    var body: some View {
         VStack {
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .resizable()
-                    .frame(width: 15, height: 15)
-                    .foregroundStyle(AppColor.gray)
-                
-                Link(destination: URL(string: link.url)!, label: {
-                    Text(link.title)
-                        .lineLimit(1)
-                        .font(.system(size: 15))
-                        .padding(.leading, 20)
-                        .foregroundStyle(isOnHover ? .blue : AppColor.dark)
-                        .underline(isOnHover ? true : false)
-                })
-                .onHover { bool in
-                    self.isOnHover = bool
-                }
-                
-                Spacer()
-
-                Button {
-                    viewModel.deleteLink(link)
-                } label: {
-                    Text("삭제")
-                }
-
-            }
-            .padding(.vertical, 10)
-            .padding(.horizontal, 30)
-            .background(AppColor.background)
-            .clipShape(RoundedRectangle(cornerRadius: 50))
+            
         }
-        .padding(.horizontal, 50)
+        
     }
 }
 
 #Preview {
     HomeView()
+//    TestView()
 }
+
 
 

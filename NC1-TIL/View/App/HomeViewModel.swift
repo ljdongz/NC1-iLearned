@@ -21,6 +21,7 @@ class HomeViewModel {
         CloudService.shared.fetchLinks { result in
             switch result {
             case .success(let links):
+                print(links)
                 self.createMonthlys(links)
                 self.totalContributions = links.count
             case .failure(let error):

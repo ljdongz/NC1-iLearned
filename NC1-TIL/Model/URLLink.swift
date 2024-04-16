@@ -10,6 +10,7 @@ import CloudKit
 
 struct URLLink: Equatable, Hashable {
     var recordID: CKRecord.ID
+    var id: Int
     var title: String
     var url: String
     var date: Date

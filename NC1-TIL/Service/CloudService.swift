@@ -32,6 +32,7 @@ class CloudService {
     
     func fetchLinks(completion: @escaping (Result<[URLLink], Error>) -> Void) {
         var links: [URLLink] = []
+        var id: Int = 1
         let predicate = NSPredicate(value: true)
         //let predicate = NSPredicate(format: "date >= %@", date as NSDate)
         
@@ -44,8 +45,9 @@ class CloudService {
         operation.recordMatchedBlock = { recordID, result in
             switch result {
             case .success(let record):
-                if let link = self.convertLinkFromRecord(from: record) {
+                if let link = self.convertLinkFromRecord(from: record, id: id) {
                     links.append(link)
+                    id += 1
                 }
             case .failure(let error):
                 completion(.failure(error))
@@ -74,7 +76,7 @@ class CloudService {
         }
     }
     
-    func convertLinkFromRecord(from record: CKRecord) -> URLLink? {
+    func convertLinkFromRecord(from record: CKRecord, id: Int) -> URLLink? {
         
         guard let recordID = record.value(forKey: "recordID") as? CKRecord.ID,
               let title = record.value(forKey: "title") as? String,
@@ -83,7 +85,7 @@ class CloudService {
             return nil
         }
         
-        return URLLink(recordID: recordID, title: title, url: url, date: date)
+        return URLLink(recordID: recordID, id: id, title: title, url: url, date: date)
     }
     
         

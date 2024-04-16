@@ -100,7 +100,7 @@ fileprivate struct CompleteView: View {
     }
 }
 
-struct CustomButtonStyle: ButtonStyle {
+fileprivate struct CustomButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .foregroundColor(configuration.isPressed ? Color.green : Color.white)
