@@ -54,12 +54,12 @@ extension Date {
         return calendar.date(from: dateComponents)!
     }
     
-    func currentYear() -> String {
-        return String(Calendar.current.component(.year, from: self))
+    func currentYear() -> Int {
+        return Calendar.current.component(.year, from: self)
     }
     
-    func currentMonth() -> String {
-        return String(Calendar.current.component(.month, from: self))
+    func currentMonth() -> Int {
+        return Calendar.current.component(.month, from: self)
     }
     
     func currentDay() -> Int {

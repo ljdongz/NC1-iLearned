@@ -50,10 +50,6 @@ class HomeViewModel {
     /// Link 데이터로 Monthlys 데이터를 만듦
     /// - Parameter links: [Link] 데이터
     func createMonthlys(_ links: [URLLink]) {
-        let calendar = Calendar.current
-        
-        var currentDate = links[0].date.convertYearAndMonthDate()
-        let endDate = links[links.count-1].date.convertYearAndMonthDate()
         
         let dic = groupedLink(links)
         let sortedDic = dic.sorted { $0.key < $1.key }
@@ -84,6 +80,11 @@ class HomeViewModel {
         return dic
     }
     
+    /// 일수만큼 배열을 만들고 각 일수마다 Link가 얼마나 등록됐는지 카운트
+    /// - Parameters:
+    ///   - days: 총 일수
+    ///   - links: [URLLink] 데이터
+    /// - Returns: 일수
     func assignLinkToDays(days: Int, links: [URLLink]) -> [Int] {
         var array = Array(repeating: 0, count: days)
         

@@ -29,7 +29,7 @@ struct HomeView: View {
             }
             
         }
-        .frame(width: 600, height: 450)
+        .frame(minWidth: 600, minHeight: 450)
         .onAppear {
             viewModel.fetchAllLink()
         }
@@ -85,14 +85,14 @@ fileprivate struct MonthlyView: View {
                     .frame(width: 100, height: 20)
                     .foregroundStyle(AppColor.blue)
                     .overlay {
-                        Text("\(monthly.date.currentYear())년")
+                        Text("\(String(monthly.date.currentYear())) YEAR")
                             .font(.system(size: 12, weight: .semibold))
                     }
                 Rectangle()
                     .frame(width: 100, height: 20)
                     .foregroundStyle(AppColor.green)
                     .overlay {
-                        Text("\(monthly.date.currentMonth())월")
+                        Text("\(Month(rawValue: monthly.date.currentMonth())!.description)")
                             .font(.system(size: 12, weight: .semibold))
                     }
                 Rectangle()
@@ -127,7 +127,7 @@ fileprivate struct MonthlyView: View {
             }
             .padding(.horizontal, 5)
 
-            LazyVStack {
+            LazyVStack(spacing: 2) {
                 ForEach(monthly.links, id: \.self) { link in
                     LinkView(viewModel: viewModel, link: link)
                         .padding(.horizontal, 5)
@@ -150,8 +150,8 @@ fileprivate struct LinkView: View {
         HStack {
             HStack {
                 Link(destination: URL(string: link.url)!, label: {
-                    Text("\(link.id).")
-                        .frame(width: 30, alignment: .leading)
+                    Text("[\(link.id)\t]")
+//                        .frame(width: 30, alignment: .leading)
                     Text(link.title)
                         .underline(isLinkButtonHover)
                         .tint(AppColor.textGray)
@@ -246,7 +246,6 @@ fileprivate struct CustomButtonStyle: ButtonStyle {
 
 #Preview {
     HomeView()
-//    TestView()
 }
 
 
