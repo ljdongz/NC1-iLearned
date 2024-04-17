@@ -10,8 +10,17 @@ import AppKit
 
 @Observable
 class HomeViewModel {
+    
+    enum State: String {
+        case loading = "Loading..."
+        case create = "Creating..."
+        case delete = "Deleting..."
+        case error = "Error"
+        case done = ""
+    }
+    
     var monthlys: [Monthly] = []
-    var isLoading: Bool = false
+    var state: State = .loading
     var totalContributions: Int = 0
 }
 
@@ -19,7 +28,7 @@ class HomeViewModel {
 extension HomeViewModel {
     /// 모든 Link 데이터를 가져옴
     func fetchAllLink() {
-        isLoading = true
+        state = ((state == .done) || (state == .error)) ? .loading : state
         
         CloudService.shared.fetchLinks { result in
             switch result {
@@ -30,7 +39,7 @@ extension HomeViewModel {
                 print(error)
             }
             
-            self.isLoading = false
+            self.state = .done
         }
     }
     
@@ -38,7 +47,7 @@ extension HomeViewModel {
     /// 특정 Link 데이터 삭제
     /// - Parameter link: 삭제할 Link 데이터
     func deleteLink(_ link: URLLink) {
-        isLoading = true
+        state = .delete
         
         CloudService.shared.deleteLink(link.recordID) { result in
             switch result {
@@ -46,7 +55,7 @@ extension HomeViewModel {
                 self.fetchAllLink()
             case .failure(let failure):
                 print(failure.localizedDescription)
-                self.isLoading = false
+                self.state = .error
             }
         }
     }

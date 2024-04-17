@@ -202,10 +202,10 @@ fileprivate struct CommandInputView: View {
     
     fileprivate var body: some View {
         HStack {
-            if viewModel.isLoading {
+            if viewModel.state != .done {
                 VStack(alignment: .leading) {
                     HStack {
-                        Text("Loading...")
+                        Text(viewModel.state.rawValue)
                         
                         ProgressView()
                             .frame(width: 12, height: 12)
