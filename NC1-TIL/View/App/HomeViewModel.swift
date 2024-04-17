@@ -13,8 +13,6 @@ class HomeViewModel {
     var monthlys: [Monthly] = []
     var isLoading: Bool = false
     var totalContributions: Int = 0
-    
-    private let commandManager = TerminalCommandManager()
 }
 
 // MARK: - CloudSerivce 관련 로직
@@ -121,11 +119,12 @@ extension HomeViewModel {
         case .help:
             completion("도움말")
         case .create:
-            self.commandManager.create(cmd, completion: completion)
+            TerminalCommandManager.shared.create(cmd, completion: completion)
+            
         case .read:
-            self.commandManager.read(cmd, monthlys: monthlys)
+            TerminalCommandManager.shared.read(cmd, monthlys: monthlys)
         case .delete:
-            guard let link = self.commandManager.delete(cmd, monthlys: monthlys) else {
+            guard let link = TerminalCommandManager.shared.delete(cmd, monthlys: monthlys) else {
                 completion("삭제 에러")
                 return
             }
@@ -139,7 +138,10 @@ extension HomeViewModel {
 }
 
 
-class TerminalCommandManager {
+struct TerminalCommandManager {
+    
+    static let shared = TerminalCommandManager()
+    private init() {}
     
     func create(_ cmd: [String], completion: @escaping (String) -> Void) {
         if cmd.count != 3 {

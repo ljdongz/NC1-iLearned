@@ -15,11 +15,9 @@ struct HomeView: View {
             AppColor.background.ignoresSafeArea(.all)
             
             VStack {
-                HStack {
-                    Spacer()
-                    RefreshButton(viewModel: viewModel)
-                }
-                .padding(15)
+                RefreshButton(viewModel: viewModel)
+                    .padding(.horizontal, 15)
+                    .padding(.top, 15)
                 
                 MainScrollView(viewModel: viewModel)
                 
@@ -43,14 +41,19 @@ fileprivate struct RefreshButton: View {
     fileprivate var body: some View {
         
         HStack {
+            Text("\(viewModel.totalContributions) contributions so far.")
+                .font(.custom(AppFont.main, size: 20))
+                .fontWeight(.semibold)
+            Spacer()
+            
             Text("최근 업데이트: \(Date().convertToString())")
                 .foregroundStyle(AppColor.textGray)
+                .font(.custom(AppFont.main, size: 12))
             Button(
                 action: {
                     viewModel.fetchAllLink()
                 },
                 label: {
-//                    Image(systemName: "arrow.clockwise")
                     Image(.refreshPx)
                         .resizable()
                         .frame(width: 12, height: 14)
@@ -59,7 +62,7 @@ fileprivate struct RefreshButton: View {
             .buttonStyle(CustomButtonStyle())
             
         }
-        .font(.custom(AppFont.main, size: 12))
+        
     }
 }
 
@@ -85,32 +88,33 @@ fileprivate struct MonthlyView: View {
         VStack {
             HStack(spacing: 0) {
                 Rectangle()
-                    .frame(width: 100, height: 20)
-                    .foregroundStyle(AppColor.blue)
+                    .frame(width: 90, height: 20)
                     .overlay {
                         Text("\(String(monthly.date.currentYear())) YEAR")
+                            .foregroundStyle(AppColor.red)
                     }
                 Rectangle()
-                    .frame(width: 100, height: 20)
-                    .foregroundStyle(AppColor.green)
+                    .frame(width: 90, height: 20)
                     .overlay {
                         Text("\(Month(rawValue: monthly.date.currentMonth())!.description)")
+                            .foregroundStyle(AppColor.yellow)
                     }
                 Rectangle()
-                    .frame(width: 100, height: 20)
-                    .foregroundStyle(AppColor.yellow)
+                    .frame(width: 90, height: 20)
                     .overlay {
                         Text("+\(monthly.days.filter { $0 != 0 }.count) Days")
+                            .foregroundStyle(AppColor.green)
                     }
                 Rectangle()
-                    .frame(width: 100, height: 20)
-                    .foregroundStyle(AppColor.red)
+                    .frame(width: 90, height: 20)
                     .overlay {
                         Text("+\(monthly.links.count) Learned")
+                            .foregroundStyle(AppColor.blue)
                     }
                 Spacer()
             }
-            .font(.custom(AppFont.main, size: 15))
+            .foregroundStyle(AppColor.backgroundSub)
+            .font(.custom(AppFont.main, size: 14))
             .fontWeight(.bold)
             
             HStack(spacing: 1.5) {
