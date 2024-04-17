@@ -212,7 +212,9 @@ fileprivate struct CommandInputView: View {
                 TextField("명령어 입력 창", text: $text)
                     .textFieldStyle(.plain)
                     .onSubmit {
-                        print(text)
+                        viewModel.inputCommand(text) { result in
+                            print(result)
+                        }
                         text = ""
                     }
                     .focused($isFocused)

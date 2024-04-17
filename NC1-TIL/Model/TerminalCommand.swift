@@ -7,3 +7,14 @@
 
 import Foundation
 
+enum TerminalCommand: String {
+    case help = "help"
+    case create = "create"
+    case read = "read"
+    case delete = "delete"
+    case refresh = "refresh"
+}
+
+enum CommandError: Error {
+    case invalid
+}
