@@ -50,7 +50,10 @@ fileprivate struct RefreshButton: View {
                     viewModel.fetchAllLink()
                 },
                 label: {
-                    Image(systemName: "arrow.clockwise")
+//                    Image(systemName: "arrow.clockwise")
+                    Image(.refreshPx)
+                        .resizable()
+                        .frame(width: 12, height: 14)
                 }
             )
             .buttonStyle(CustomButtonStyle())
@@ -142,7 +145,6 @@ fileprivate struct LinkView: View {
     
     @State private var isLinkButtonHover: Bool = false
     @State private var isDeleteButtonHover: Bool = false
-    @State private var isEditButtonHover: Bool = false
     
     fileprivate var body: some View {
         HStack {
@@ -157,29 +159,17 @@ fileprivate struct LinkView: View {
                 
                 
                 if isLinkButtonHover {
-                    HStack {
-                        Button(action: {
-                            
-                        }, label: {
-                            Image(systemName: "pencil")
-                                .resizable()
-                                .frame(width: 10, height: 10)
-                        })
-                        .onHover { isEditButtonHover = $0 }
-
-                        
-                        Button(action: {
-                            viewModel.deleteLink(link)
-                        }, label: {
-                            Image(systemName: "trash")
-                                .resizable()
-                                .frame(width: 10, height: 10)
-                        })
-                        .onHover { isDeleteButtonHover = $0 }
-                        
-                        
-                    }
+                    Button(action: {
+                        viewModel.deleteLink(link)
+                    }, label: {
+                        Image(systemName: "trash")
+                            .resizable()
+                            .frame(width: 10, height: 10)
+                            .fontWeight(isDeleteButtonHover ? .semibold : .medium)
+                    })
+                    .onHover { isDeleteButtonHover = $0 }
                     .buttonStyle(PlainButtonStyle())
+                    
                 }
                 
                 Spacer()
@@ -230,7 +220,7 @@ fileprivate struct CommandInputView: View {
             
             Spacer()
         }
-        .font(.custom(AppFont.main, size: 13))
+        .font(.custom(AppFont.main, size: 12))
         .fontWeight(.medium)
     }
 }
