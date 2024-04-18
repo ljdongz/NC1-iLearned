@@ -15,102 +15,60 @@ class HomeViewModel {
     private(set) var totalContributions: Int = 0
     private(set) var isLoading: Bool = false
     private(set) var terminalText: String = ""
-    
+}
+
+
+// MARK: - HomeView 관련 로직
+extension HomeViewModel {
+    /// 터미널 입력 필드 상태를 변경
+    /// - Parameter state: 터미널 상태 종류
     func setTerminalState(_ state: TerminalState) {
-        
         switch state {
         case .load:
-            isLoading = true
-            terminalText = "Loading..."
-            CloudService.shared.fetchLinks { result in
-                switch result {
-                case .success(let links):
-                    self.createMonthlys(links)
-                    self.totalContributions = links.count
-                    self.isLoading = false
-                    self.terminalText = ""
-                case .failure(let error):
-                    self.isLoading = false
-                    self.terminalText = error.localizedDescription
-                }
-            }
+            self.updateTerminalField(text: "Loading...", isLoading: true)
+            Task { await fetchAllLinks() }
         case .create(let title, let url):
-            isLoading = true
-            terminalText = "Creating..."
-            CloudService.shared.saveLink(title: title, url: url) { result in
-                
-                switch result {
-                case .success:
-                    CloudService.shared.fetchLinks { result in
-                        switch result {
-                        case .success(let links):
-                            self.createMonthlys(links)
-                            self.totalContributions = links.count
-                            self.isLoading = false
-                            self.terminalText = ""
-                        case .failure(let error):
-                            self.isLoading = false
-                            self.terminalText = error.localizedDescription
-                        }
-                    }
-                case .failure(let failure):
-                    self.terminalText = failure.localizedDescription
-                }
-            }
+            self.updateTerminalField(text: "Creating...", isLoading: true)
+            Task { await saveLink(title: title, url: url) }
         case .read(let id):
-            isLoading = false
-            for monthly in monthlys {
-                for link in monthly.links {
-                    if link.id == id {
-                        let isValid = openURL(urlString: link.url)
-                        self.terminalText = isValid ? "" : "유효하지 않은 URL"
-                    }
-                }
-            }
+            self.updateTerminalField(text: "Input Command", isLoading: false)
+            self.getLinkFromLinkID(id)
         case .delete(let id):
-            isLoading = true
-            terminalText = "Deleting..."
-            for monthly in monthlys {
-                for link in monthly.links {
-                    if link.id == id {
-                        CloudService.shared.deleteLink(link.recordID) { result in
-                            
-                            switch result {
-                            case .success:
-                                CloudService.shared.fetchLinks { result in
-                                    switch result {
-                                    case .success(let links):
-                                        self.createMonthlys(links)
-                                        self.totalContributions = links.count
-                                        self.isLoading = false
-                                        self.terminalText = ""
-                                    case .failure(let error):
-                                        self.isLoading = false
-                                        self.terminalText = error.localizedDescription
-                                    }
-                                }
-                            case .failure(let failure):
-                                self.terminalText = failure.localizedDescription
-                            }
-                        }
-                    }
-                }
-            }
-            
-        case .help:
-            isLoading = false
-        case .error(let message):
-            isLoading = false
-            terminalText = message
-        case .done:
-            isLoading = false
-            terminalText = "Input Command"
-        case .invalid(let message):
-            isLoading = false
-            terminalText = message
+            self.updateTerminalField(text: "Deleting...", isLoading: true)
+            self.deleteLink(id)
+        case .help, .done:
+            self.updateTerminalField(text: "Input Command", isLoading: false)
+        case .error(let message), .invalid(message: let message):
+            self.updateTerminalField(text: message, isLoading: false)
         }
     }
     
+    /// Terminal Input Field 상태를 변경
+    /// - Parameters:
+    ///   - text: TextField에 보여줄 text
+    ///   - isLoading: ProgressView를 나타낼지 여부
+    private func updateTerminalField(text: String, isLoading: Bool) {
+        self.terminalText = text
+        self.isLoading = isLoading
+    }
+    
+    /// URL 주소로 이동
+    /// - Parameter id: Link ID
+    private func getLinkFromLinkID(_ id: Int) {
+        for monthly in monthlys {
+            for link in monthly.links {
+                if link.id == id {
+                    let isValid = openURL(urlString: link.url)
+                    let text = isValid ? "Input Command" : "유효하지 않은 URL"
+                    self.updateTerminalField(text: text, isLoading: false)
+                }
+            }
+        }
+    }
+    
+    /// URL 주소로 브라우저를 엶
+    /// - Parameter urlString: url 주소
+    /// - Returns: URL 주소가 유효한지에 대한 여부
     private func openURL(urlString: String) -> Bool {
         guard let url = URL(string: urlString) else {
             return false
@@ -122,6 +80,71 @@ class HomeViewModel {
 
 // MARK: - CloudSerivce 관련 로직
 extension HomeViewModel {
+    /// CloudService를 통해 모든 Link 데이터를 가져옴
+    private func fetchAllLinks() async {
+        CloudService.shared.fetchLinks { result in
+            switch result {
+            case .success(let links):
+                self.createMonthlys(links)
+                self.totalContributions = links.count
+                self.updateTerminalField(text: "Input Command", isLoading: false)
+            case .failure(let error):
+                self.updateTerminalField(text: error.localizedDescription, isLoading: false)
+            }
+        }
+    }
+    
+    /// CloudService를 통해 새로운 Link 데이터 생성
+    /// - Parameters:
+    ///   - title: 제목
+    ///   - url: URL 주소
+    private func saveLink(title: String, url: String) async {
+        CloudService.shared.saveLink(title: title, url: url) { result in
+            switch result {
+            case .success:
+                CloudService.shared.fetchLinks { result in
+                    switch result {
+                    case .success(let links):
+                        self.createMonthlys(links)
+                        self.totalContributions = links.count
+                        self.updateTerminalField(text: "Input Command", isLoading: false)
+                    case .failure(let error):
+                        self.updateTerminalField(text: error.localizedDescription, isLoading: false)
+                    }
+                }
+            case .failure(let failure):
+                self.updateTerminalField(text: failure.localizedDescription, isLoading: false)
+            }
+        }
+    }
+    
+    /// CloudService를 통해 Link 데이터 삭제
+    /// - Parameter id: Link ID
+    private func deleteLink(_ id: Int) {
+        for monthly in monthlys {
+            for link in monthly.links {
+                if link.id == id {
+                    CloudService.shared.deleteLink(link.recordID) { result in
+                        switch result {
+                        case .success:
+                            CloudService.shared.fetchLinks { result in
+                                switch result {
+                                case .success(let links):
+                                    self.createMonthlys(links)
+                                    self.totalContributions = links.count
+                                    self.updateTerminalField(text: "Input Command", isLoading: false)
+                                case .failure(let error):
+                                    self.updateTerminalField(text: error.localizedDescription, isLoading: false)
+                                }
+                            }
+                        case .failure(let failure):
+                            self.updateTerminalField(text: failure.localizedDescription, isLoading: false)
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 // MARK: - Date 관련 로직
