@@ -38,23 +38,29 @@ fileprivate struct InputView: View {
             Spacer()
             
             Text("Today I Learned!")
-                .font(.system(size: 30, weight: .bold))
-            
+                .font(.custom(AppFont.main, size: 30))
+                .fontWeight(.bold)
             Spacer()
             
             VStack(alignment: .leading) {
                 
                 Text("Title")
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.custom(AppFont.main, size: 16))
+                    .fontWeight(.semibold)
                 TextField("", text: $titleText)
+                    .font(.custom(AppFont.main, size: 16))
+                    .fontWeight(.semibold)
                     .focused($isFocused)
                 
                 Spacer()
                     .frame(height: 20)
                 
                 Text("URL")
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.custom(AppFont.main, size: 16))
+                    .fontWeight(.semibold)
                 TextField("", text: $urlText)
+                    .font(.custom(AppFont.main, size: 16))
+                    .fontWeight(.semibold)
                 
                 Spacer()
                     .frame(height: 20)
@@ -73,7 +79,8 @@ fileprivate struct InputView: View {
                 },
                 label: {
                     Text("Save")
-                        .font(.system(size: 20))
+                        .font(.custom(AppFont.main, size: 20))
+                        .fontWeight(.medium)
                         .frame(width: 270, height: 40)
                 })
             .buttonStyle(CustomButtonStyle())
@@ -89,13 +96,17 @@ fileprivate struct CompleteView: View {
     fileprivate var body: some View {
         VStack {
             Text("\(message)")
-                .font(.system(size: 20))
+                .font(.custom(AppFont.main, size: 20))
+                .fontWeight(.medium)
             
             Button(
                 action: { viewModel.changeState(.input) },
                 label: {
                     Text("확인")
+                        .font(.custom(AppFont.main, size: 20))
+                        .fontWeight(.medium)
                 })
+            .buttonStyle(CustomButtonStyle())
         }
     }
 }
@@ -103,8 +114,8 @@ fileprivate struct CompleteView: View {
 fileprivate struct CustomButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .foregroundColor(configuration.isPressed ? Color.green : Color.white)
-            .background(configuration.isPressed ? Color.white : Color.green)
+            .foregroundColor(configuration.isPressed ? Color.greenMain : Color.textWhite)
+            .background(configuration.isPressed ? Color.textWhite : Color.greenMain)
             .cornerRadius(6.0)
             .padding()
     }
