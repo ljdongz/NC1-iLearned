@@ -88,25 +88,25 @@ fileprivate struct MonthlyView: View {
         VStack {
             HStack(spacing: 0) {
                 Rectangle()
-                    .frame(width: 90, height: 20)
+                    .frame(width: 95, height: 20)
                     .overlay {
                         Text("\(String(monthly.date.currentYear())) YEAR")
                             .foregroundStyle(AppColor.red)
                     }
                 Rectangle()
-                    .frame(width: 90, height: 20)
+                    .frame(width: 95, height: 20)
                     .overlay {
                         Text("\(Month(rawValue: monthly.date.currentMonth())!.description)")
                             .foregroundStyle(AppColor.yellow)
                     }
                 Rectangle()
-                    .frame(width: 90, height: 20)
+                    .frame(width: 95, height: 20)
                     .overlay {
                         Text("+\(monthly.days.filter { $0 != 0 }.count) Days")
                             .foregroundStyle(AppColor.green)
                     }
                 Rectangle()
-                    .frame(width: 90, height: 20)
+                    .frame(width: 95, height: 20)
                     .overlay {
                         Text("+\(monthly.links.count) Learned")
                             .foregroundStyle(AppColor.blue)
@@ -114,13 +114,14 @@ fileprivate struct MonthlyView: View {
                 Spacer()
             }
             .foregroundStyle(AppColor.backgroundSub)
-            .font(.custom(AppFont.main, size: 14))
+            .font(.custom(AppFont.main, size: 15))
             .fontWeight(.bold)
             
             HStack(spacing: 1.5) {
                 ForEach(Array(monthly.days.enumerated()), id: \.0) { idx, count in
-                    RoundedRectangle(cornerRadius: 2)
-                        .frame(width: 10, height: 10)
+                    Image(.blockPx)
+                        .resizable()
+                        .frame(width: 11, height: 11)
                         .foregroundStyle(count != 0 ? AppColor.green : AppColor.dark)
                     
                     if (idx + 1) % 7 == 0 {
@@ -168,7 +169,7 @@ fileprivate struct LinkView: View {
                     }, label: {
                         Image(systemName: "trash")
                             .resizable()
-                            .frame(width: 10, height: 10)
+                            .frame(width: 12, height: 12)
                             .fontWeight(isDeleteButtonHover ? .semibold : .medium)
                     })
                     .onHover { isDeleteButtonHover = $0 }
@@ -181,14 +182,18 @@ fileprivate struct LinkView: View {
             .onHover { isLinkButtonHover = $0 }
             
             
-            Rectangle()
-                .frame(width: 100, height: 16)
-                .foregroundStyle(AppColor.gray)
-                .overlay {
-                    Text("\(link.date.convertToString())")
-                }
+//            Rectangle()
+//                .frame(width: 100, height: 16)
+//                .foregroundStyle(AppColor.gray)
+//                .overlay {
+//                    Text("\(link.date.convertToString())")
+//                }
+            Text("\(link.date.convertToString())")
+                .frame(width: 120)
+                .padding(.vertical, 2)
+                .background(AppColor.dark)
         }
-        .font(.custom(AppFont.main, size: 12))
+        .font(.custom(AppFont.main, size: 13))
         .foregroundStyle(AppColor.textGray)
     }
 }
@@ -225,7 +230,7 @@ fileprivate struct CommandInputView: View {
             
             Spacer()
         }
-        .font(.custom(AppFont.main, size: 12))
+        .font(.custom(AppFont.main, size: 13))
         .fontWeight(.medium)
     }
 }
