@@ -20,19 +20,21 @@ class StatusBarController {
         self.popover.behavior = .transient
         
         if let button = statusItem.button {
-            button.image = NSImage(resource: .sample)
-            button.image?.size = NSSize(width: 20, height: 18)
-            button.imagePosition = .imageLeading
+            button.image = NSImage(systemSymbolName: "link", accessibilityDescription: nil)
+//            button.image = NSImage(resource: .sample)
+//            button.image?.size = NSSize(width: 18, height: 18)
+//            button.imagePosition = .imageLeading
+            
             button.action = #selector(showApp(sender:))
             button.target = self
         }
         
-        setupObservers()
+        //setupObservers()
     }
     
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
+//    deinit {
+//        NotificationCenter.default.removeObserver(self)
+//    }
 }
 
 extension StatusBarController {

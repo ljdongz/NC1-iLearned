@@ -181,13 +181,6 @@ fileprivate struct LinkView: View {
             }
             .onHover { isLinkButtonHover = $0 }
             
-            
-//            Rectangle()
-//                .frame(width: 100, height: 16)
-//                .foregroundStyle(AppColor.gray)
-//                .overlay {
-//                    Text("\(link.date.convertToString())")
-//                }
             Text("\(link.date.convertToString())")
                 .frame(width: 120)
                 .padding(.vertical, 2)
