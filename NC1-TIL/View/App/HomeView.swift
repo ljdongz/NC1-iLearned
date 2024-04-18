@@ -167,9 +167,11 @@ fileprivate struct LinkView: View {
                     Button(action: {
                         viewModel.setTerminalState(.delete(id: link.id))
                     }, label: {
-                        Image(systemName: "trash")
+//                        Image(systemName: "trash")
+                        Image(.trashPx)
                             .resizable()
                             .frame(width: 12, height: 12)
+                            .foregroundStyle(AppColor.textGray)
                             .fontWeight(isDeleteButtonHover ? .semibold : .medium)
                     })
                     .onHover { isDeleteButtonHover = $0 }
