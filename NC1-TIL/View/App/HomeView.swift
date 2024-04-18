@@ -29,7 +29,7 @@ struct HomeView: View {
         }
         .frame(minWidth: 600, minHeight: 450)
         .onAppear {
-            viewModel.fetchAllLink()
+            viewModel.setTerminalState(.load)
         }
     }
 }
@@ -51,7 +51,7 @@ fileprivate struct RefreshButton: View {
                 .font(.custom(AppFont.main, size: 12))
             Button(
                 action: {
-                    viewModel.fetchAllLink()
+                    viewModel.setTerminalState(.load)
                 },
                 label: {
                     Image(.refreshPx)
@@ -164,7 +164,7 @@ fileprivate struct LinkView: View {
                 
                 if isLinkButtonHover {
                     Button(action: {
-                        viewModel.deleteLink(link)
+                        viewModel.setTerminalState(.delete(id: link.id))
                     }, label: {
                         Image(systemName: "trash")
                             .resizable()
@@ -202,10 +202,10 @@ fileprivate struct CommandInputView: View {
     
     fileprivate var body: some View {
         HStack {
-            if viewModel.state != .done {
+            if viewModel.isLoading {
                 VStack(alignment: .leading) {
                     HStack {
-                        Text(viewModel.state.rawValue)
+                        Text(viewModel.terminalText)
                         
                         ProgressView()
                             .frame(width: 12, height: 12)
@@ -213,12 +213,11 @@ fileprivate struct CommandInputView: View {
                     }
                 }
             } else {
-                TextField("명령어 입력 창", text: $text)
+                TextField(viewModel.terminalText, text: $text)
                     .textFieldStyle(.plain)
                     .onSubmit {
-                        viewModel.inputCommand(text) { result in
-                            print(result)
-                        }
+                        let state = TerminalCommandManager.shared.inputCommand(text)
+                        viewModel.setTerminalState(state)
                         text = ""
                     }
                     .focused($isFocused)

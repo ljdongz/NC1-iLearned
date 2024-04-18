@@ -11,54 +11,123 @@ import AppKit
 @Observable
 class HomeViewModel {
     
-    enum State: String {
-        case loading = "Loading..."
-        case create = "Creating..."
-        case delete = "Deleting..."
-        case error = "Error"
-        case done = ""
+    var monthlys: [Monthly] = [] {
+        didSet {
+            print(monthlys)
+        }
     }
     
-    var monthlys: [Monthly] = []
-    var state: State = .loading
     var totalContributions: Int = 0
+    
+    var isLoading: Bool = false
+    var terminalText: String = ""
+    
+    func setTerminalState(_ state: TerminalState) {
+        
+        switch state {
+        case .load:
+            isLoading = true
+            terminalText = "Loading..."
+            CloudService.shared.fetchLinks { result in
+                switch result {
+                case .success(let links):
+                    self.createMonthlys(links)
+                    self.totalContributions = links.count
+                    self.isLoading = false
+                    self.terminalText = ""
+                case .failure(let error):
+                    self.isLoading = false
+                    self.terminalText = error.localizedDescription
+                }
+            }
+        case .create(let title, let url):
+            isLoading = true
+            terminalText = "Creating..."
+            CloudService.shared.saveLink(title: title, url: url) { result in
+                
+                switch result {
+                case .success:
+                    CloudService.shared.fetchLinks { result in
+                        switch result {
+                        case .success(let links):
+                            self.createMonthlys(links)
+                            self.totalContributions = links.count
+                            self.isLoading = false
+                            self.terminalText = ""
+                        case .failure(let error):
+                            self.isLoading = false
+                            self.terminalText = error.localizedDescription
+                        }
+                    }
+                case .failure(let failure):
+                    self.terminalText = failure.localizedDescription
+                }
+            }
+        case .read(let id):
+            isLoading = false
+            for monthly in monthlys {
+                for link in monthly.links {
+                    if link.id == id {
+                        let isValid = openURL(urlString: link.url)
+                        self.terminalText = isValid ? "" : "유효하지 않은 URL"
+                    }
+                }
+            }
+        case .delete(let id):
+            isLoading = true
+            terminalText = "Deleting..."
+            for monthly in monthlys {
+                for link in monthly.links {
+                    if link.id == id {
+                        CloudService.shared.deleteLink(link.recordID) { result in
+                            
+                            switch result {
+                            case .success:
+                                CloudService.shared.fetchLinks { result in
+                                    switch result {
+                                    case .success(let links):
+                                        self.createMonthlys(links)
+                                        self.totalContributions = links.count
+                                        self.isLoading = false
+                                        self.terminalText = ""
+                                    case .failure(let error):
+                                        self.isLoading = false
+                                        self.terminalText = error.localizedDescription
+                                    }
+                                }
+                            case .failure(let failure):
+                                self.terminalText = failure.localizedDescription
+                            }
+                        }
+                    }
+                }
+            }
+            
+        case .help:
+            isLoading = false
+        case .error(let message):
+            isLoading = false
+            terminalText = message
+        case .done:
+            isLoading = false
+            terminalText = "Input Command"
+        case .invalid(let message):
+            isLoading = false
+            terminalText = message
+        }
+    }
+    
+    private func openURL(urlString: String) -> Bool {
+        guard let url = URL(string: urlString) else {
+            return false
+        }
+        
+        return NSWorkspace.shared.open(url)
+    }
 }
 
 // MARK: - CloudSerivce 관련 로직
 extension HomeViewModel {
-    /// 모든 Link 데이터를 가져옴
-    func fetchAllLink() {
-        state = ((state == .done) || (state == .error)) ? .loading : state
-        
-        CloudService.shared.fetchLinks { result in
-            switch result {
-            case .success(let links):
-                self.createMonthlys(links)
-                self.totalContributions = links.count
-            case .failure(let error):
-                print(error)
-            }
-            
-            self.state = .done
-        }
-    }
-    
-    
-    /// 특정 Link 데이터 삭제
-    /// - Parameter link: 삭제할 Link 데이터
-    func deleteLink(_ link: URLLink) {
-        state = .delete
-        
-        CloudService.shared.deleteLink(link.recordID) { result in
-            switch result {
-            case .success:
-                self.fetchAllLink()
-            case .failure(let failure):
-                print(failure.localizedDescription)
-                self.state = .error
-            }
-        }
-    }
 }
 
 // MARK: - Date 관련 로직
@@ -113,99 +182,53 @@ extension HomeViewModel {
     }
 }
 
-// MARK: - Command 관련 로직
-extension HomeViewModel {
-    func inputCommand(_ command: String, completion: @escaping (String) -> Void) {
-        
-        let cmd = command.split(separator: " ").map { String($0) }
-        
-        guard let c = TerminalCommand(rawValue: cmd[0]) else {
-            completion("커멘드 에러")
-            return
-        }
-        
-        switch c {
-        case .help:
-            completion("도움말")
-        case .create:
-            TerminalCommandManager.shared.create(cmd, completion: completion)
-            
-        case .read:
-            TerminalCommandManager.shared.read(cmd, monthlys: monthlys)
-        case .delete:
-            guard let link = TerminalCommandManager.shared.delete(cmd, monthlys: monthlys) else {
-                completion("삭제 에러")
-                return
-            }
-            self.deleteLink(link)
-        case .refresh:
-            self.fetchAllLink()
-            completion("성공")
-        }
-    }
-    
-}
-
-
 struct TerminalCommandManager {
     
     static let shared = TerminalCommandManager()
     private init() {}
     
-    func create(_ cmd: [String], completion: @escaping (String) -> Void) {
-        if cmd.count != 3 {
-            return
+    func inputCommand(_ command: String) -> TerminalState {
+        let cmds = command.trimmingCharacters(in: .whitespaces).split(separator: " ").map { String($0) }
+        
+        if cmds.count == 0 { return .done } // 입력한 명령어가 없음
+        
+        guard let cmd = TerminalCommand(rawValue: cmds[0]) else {
+            return .invalid(message: "\(cmds[0]) is invalid command") // 존재하지 않는 명령어
         }
         
-        CloudService.shared.saveLink(title: cmd[1], url: cmd[2]) { result in
-            switch result {
-            case .success(let success):
-                completion("저장 성공")
-            case .failure(let failure):
-                completion("저장 에러")
-            }
+        switch cmd {
+        case .help:
+            return .help
+        case .create:
+            return create(cmds)
+        case .read:
+            return read(cmds)
+        case .delete:
+            return delete(cmds)
+        case .refresh:
+            return .load
         }
     }
     
-    func read(_ cmd: [String], monthlys: [Monthly]) {
-        guard cmd.count == 2, let id = Int(cmd[1]) else  {
-            return
-        }
-        
-        for monthly in monthlys {
-            for link in monthly.links {
-                if link.id == id {
-                    let _ = isValid(urlString: link.url)
-                    return
-                }
-            }
-        }
+    private func create(_ cmd: [String]) -> TerminalState {
+        if cmd.count != 3 { return .invalid(message: "매개변수 개수 에러") }
+        else { return .create(title: cmd[1], url: cmd[2])}
     }
     
-    func delete(_ cmd: [String], monthlys: [Monthly]) -> URLLink? {
-        guard cmd.count == 2, let id = Int(cmd[1]) else  {
-            print("1")
-            return nil
-        }
+    private func read(_ cmd: [String]) -> TerminalState {
         
-        for monthly in monthlys {
-            for link in monthly.links {
-                if link.id == id {
-                    return link
-                }
-            }
-        }
+        guard cmd.count == 2 else { return .invalid(message: "매개변수 개수 에러") }
+        guard let id = Int(cmd[1]) else { return .invalid(message: "번호 입력 에러") }
         
-        return nil
+        return .read(id: id)
     }
     
-    func isValid(urlString: String) -> Bool {
-        guard let url = URL(string: urlString) else {
-            print("URL is Invalid")
-            return false
-        }
+    private func delete(_ cmd: [String]) -> TerminalState {
         
-        print("valid")
-        return NSWorkspace.shared.open(url)
+        guard cmd.count == 2 else { return .invalid(message: "매개변수 개수 에러") }
+        guard let id = Int(cmd[1]) else { return .invalid(message: "번호 입력 에러") }
+        
+        return .delete(id: id)
     }
+    
 }
