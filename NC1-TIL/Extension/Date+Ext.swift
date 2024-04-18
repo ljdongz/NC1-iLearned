@@ -9,21 +9,6 @@ import Foundation
 
 extension Date {
     
-    /// 현재 시간(UTC+9)을 UTC와 일치시키도록 변환하는 작업 (Cloud에 데이터를 올릴 때 Date 변환)
-    /// - Returns: UTC 시간
-    func convertUTCTimeFromNow() -> Self {
-        let calendar = Calendar.current
-        var components = DateComponents()
-        
-        components.year = calendar.component(.year, from: self)
-        components.month = calendar.component(.month, from: self)
-        components.day = calendar.component(.day, from: self)
-        components.hour = calendar.component(.hour, from: self) + 9
-        components.minute = calendar.component(.minute, from: self)
-
-        return calendar.date(from: components)!
-    }
-    
     /// 현재 달에 총 며칠이 있는지를 계산
     /// - Returns: 총 일수
     func daysInMonth() -> Int {
@@ -68,7 +53,7 @@ extension Date {
     
     func convertToString() -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MM월 dd일 hh:mm"
+        formatter.dateFormat = "MM월 dd일 HH:mm"
         return formatter.string(from: self)
     }
 }

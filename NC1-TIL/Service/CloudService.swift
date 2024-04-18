@@ -19,7 +19,7 @@ class CloudService {
         let record = CKRecord(recordType: recordType)
         record["title"] = title
         record["url"] = url
-        record["date"] = Date().convertUTCTimeFromNow() as NSDate
+        record["date"] = Date() as NSDate
         
         let publicDatabase = container.publicCloudDatabase
         publicDatabase.save(record) { _, error in
