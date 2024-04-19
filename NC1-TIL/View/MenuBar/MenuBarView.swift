@@ -43,39 +43,25 @@ fileprivate struct InputView: View {
             Spacer()
             
             VStack(alignment: .leading) {
-                
                 Text("Title")
-                    .font(.custom(AppFont.main, size: 16))
-                    .fontWeight(.semibold)
                 TextField("", text: $titleText)
-                    .font(.custom(AppFont.main, size: 16))
-                    .fontWeight(.semibold)
                     .focused($isFocused)
                 
                 Spacer()
                     .frame(height: 20)
                 
                 Text("URL")
-                    .font(.custom(AppFont.main, size: 16))
-                    .fontWeight(.semibold)
                 TextField("", text: $urlText)
-                    .font(.custom(AppFont.main, size: 16))
-                    .fontWeight(.semibold)
                 
                 Spacer()
                     .frame(height: 20)
             }
+            .font(.custom(AppFont.main, size: 16))
+            .fontWeight(.semibold)
             
             Button(
                 action: {
-                    viewModel.saveButtonTapped(title: titleText, url: urlText) { result in
-                        switch result {
-                        case .success(let success):
-                            self.viewModel.changeState(.complete(message: success))
-                        case .failure(let failure):
-                            self.viewModel.changeState(.complete(message: failure.localizedDescription))
-                        }
-                    }
+                    viewModel.saveButtonTapped(title: titleText, url: urlText)
                 },
                 label: {
                     Text("Save")
@@ -90,24 +76,26 @@ fileprivate struct InputView: View {
 }
 
 fileprivate struct CompleteView: View {
-    var viewModel: MenuBarViewModel
+    let viewModel: MenuBarViewModel
     let message: String
     
     fileprivate var body: some View {
         VStack {
+            Spacer()
             Text("\(message)")
-                .font(.custom(AppFont.main, size: 20))
-                .fontWeight(.medium)
-            
+                
+            Spacer()
             Button(
                 action: { viewModel.changeState(.input) },
                 label: {
                     Text("확인")
-                        .font(.custom(AppFont.main, size: 20))
-                        .fontWeight(.medium)
+                        .frame(width: 270, height: 40)
                 })
             .buttonStyle(CustomButtonStyle())
         }
+        .font(.custom(AppFont.main, size: 20))
+        .fontWeight(.medium)
+        .padding()
     }
 }
 

@@ -21,11 +21,17 @@ class MenuBarViewModel {
         self.state = state
     }
     
-    func saveButtonTapped(title: String, url: String, completion: @escaping (Result<String, Error>) -> Void) {
+    func saveButtonTapped(title: String, url: String) {
         changeState(.loading)
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             CloudService.shared.saveLink(title: title, url: url) { result in
-                completion(result)
+                switch result {
+                case .success(let success):
+                    self.changeState(.complete(message: success))
+                case .failure(let failure):
+                    self.changeState(.complete(message: failure.localizedDescription))
+                }
             }
         }
     }

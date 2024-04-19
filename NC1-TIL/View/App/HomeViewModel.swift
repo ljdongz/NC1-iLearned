@@ -102,16 +102,19 @@ extension HomeViewModel {
         CloudService.shared.saveLink(title: title, url: url) { result in
             switch result {
             case .success:
-                CloudService.shared.fetchLinks { result in
-                    switch result {
-                    case .success(let links):
-                        self.createMonthlys(links)
-                        self.totalContributions = links.count
-                        self.updateTerminalField(text: "Input Command", isLoading: false)
-                    case .failure(let error):
-                        self.updateTerminalField(text: error.localizedDescription, isLoading: false)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    CloudService.shared.fetchLinks { result in
+                        switch result {
+                        case .success(let links):
+                            self.createMonthlys(links)
+                            self.totalContributions = links.count
+                            self.updateTerminalField(text: "Input Command", isLoading: false)
+                        case .failure(let error):
+                            self.updateTerminalField(text: error.localizedDescription, isLoading: false)
+                        }
                     }
                 }
+                
             case .failure(let failure):
                 self.updateTerminalField(text: failure.localizedDescription, isLoading: false)
             }

@@ -14,20 +14,21 @@ struct HomeView: View {
         ZStack {
             AppColor.background.ignoresSafeArea(.all)
             
-            VStack {
+            VStack(spacing: 0) {
                 RefreshButton(viewModel: viewModel)
                     .padding(.horizontal, 15)
-                    .padding(.top, 15)
+                    .padding(.top, 10)
                 
                 MainScrollView(viewModel: viewModel)
+                    .padding(.vertical, 10)
                 
                 CommandInputView(viewModel: viewModel)
                     .padding(.horizontal)
-                    .padding(.vertical, 5)
+                    .padding(.bottom, 10)
             }
             
         }
-        .frame(minWidth: 600, minHeight: 450)
+        .frame(minWidth: 700, minHeight: 500)
         .onAppear {
             viewModel.setTerminalState(.load)
         }
@@ -72,8 +73,10 @@ fileprivate struct MainScrollView: View {
     
     fileprivate var body: some View {
         ScrollView {
-            ForEach(viewModel.monthlys, id: \.self) { monthly in
-                MonthlyView(viewModel: viewModel, monthly: monthly)
+            LazyVStack {
+                ForEach(viewModel.monthlys, id: \.self) { monthly in
+                    MonthlyView(viewModel: viewModel, monthly: monthly)
+                }
             }
         }
     }
@@ -160,6 +163,7 @@ fileprivate struct LinkView: View {
                     Text(link.title)
                         .underline(isLinkButtonHover)
                         .tint(AppColor.textGray)
+                        .lineLimit(1)
                 })
                 
                 
