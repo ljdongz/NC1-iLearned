@@ -16,7 +16,7 @@ struct MenuBarView: View {
             switch viewModel.state {
             case .input:
                 InputView(viewModel: viewModel)
-            case .loading:
+            case .creating:
                 ProgressView()
             case .complete(let message):
                 CompleteView(viewModel: viewModel, message: message)
@@ -61,7 +61,7 @@ fileprivate struct InputView: View {
             
             Button(
                 action: {
-                    viewModel.saveButtonTapped(title: titleText, url: urlText)
+                    viewModel.changeState(.creating(title: titleText, url: urlText))
                 },
                 label: {
                     Text("Save")
