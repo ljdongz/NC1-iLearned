@@ -10,10 +10,23 @@ import SwiftUI
 @main
 struct NC1_TILApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @Environment(\.openWindow) private var openWindow
     
     var body: some Scene {
         WindowGroup {
             HomeView()
+        }
+        WindowGroup(id: "help") {
+            CommandHelpView()
+        }
+        .commands {
+            CommandGroup(after: .help) {
+                Button {
+                    openWindow(id: "help")
+                } label: {
+                    Text("Terminal Commands Help")
+                }
+            }
         }
     }
 }
