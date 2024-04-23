@@ -13,24 +13,24 @@ struct TerminalCommandManager {
     static let shared = TerminalCommandManager()
     private init() {}
     
-    func inputCommand(_ command: String) -> TerminalState {
-        let cmds = command.trimmingCharacters(in: .whitespaces).split(separator: " ").map { String($0) }
+    func inputCommand(_ text: String) -> TerminalState {
+        let command = text.split(separator: " ").map { String($0) }
         
-        if cmds.count == 0 { return .done } // 입력한 명령어가 없음
+        if command.count == 0 { return .done } // 입력한 명령어가 없음
         
-        guard let cmd = TerminalCommand(rawValue: cmds[0]) else {
-            return .invalid(message: "\(cmds[0]) is invalid command") // 존재하지 않는 명령어
+        guard let mainCommand = TerminalCommand(rawValue: command[0]) else {
+            return .invalid(message: "\(command[0]) is invalid command") // 존재하지 않는 명령어
         }
         
-        switch cmd {
+        switch mainCommand {
         case .help:
             return .help
         case .create:
-            return create(cmds)
+            return create(text)
         case .read:
-            return read(cmds)
+            return read(command)
         case .delete:
-            return delete(cmds)
+            return delete(command)
         case .refresh:
             return .load
         }
@@ -38,11 +38,19 @@ struct TerminalCommandManager {
 }
 
 extension TerminalCommandManager {
-    private func create(_ cmd: [String]) -> TerminalState {
-        if cmd.count != 3 { return .invalid(message: "매개변수 개수 에러") }
-        else { return .create(title: cmd[1], url: cmd[2])}
+    
+    /// Create 커멘드 명령 로직
+    /// - Parameter text: 기존 터미널에 입력한 Text
+    /// - Returns: TerminalState
+    private func create(_ text: String) -> TerminalState {
+        let command = text.split(separator: "\"").map { String($0).trimmingCharacters(in: .whitespaces) }
+        if command.count != 3 { return .invalid(message: "매개변수 개수 에러") }
+        else { return .create(title: command[1], url: command[2]) }
     }
     
+    /// Read 커멘드 명령 로직
+    /// - Parameter cmd: 터미널에 입력한 Text를 " "로 split한 문자열 배열
+    /// - Returns: TerminalState
     private func read(_ cmd: [String]) -> TerminalState {
         
         guard cmd.count == 2 else { return .invalid(message: "매개변수 개수 에러") }
@@ -51,6 +59,9 @@ extension TerminalCommandManager {
         return .read(id: id)
     }
     
+    /// Delete 커멘트 명령 로직
+    /// - Parameter cmd: 터미널에 입력한 Text를 " "로 split한 문자열 배열
+    /// - Returns: TerminalState
     private func delete(_ cmd: [String]) -> TerminalState {
         
         guard cmd.count == 2 else { return .invalid(message: "매개변수 개수 에러") }

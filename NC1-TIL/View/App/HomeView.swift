@@ -227,7 +227,7 @@ fileprivate struct CommandInputView: View {
                 TextField(viewModel.terminalText, text: $text)
                     .textFieldStyle(.plain)
                     .onSubmit {
-                        let state = TerminalCommandManager.shared.inputCommand(text)
+                        let state = TerminalCommandManager.shared.inputCommand(text.trimmingCharacters(in: .whitespaces))
                         viewModel.setTerminalState(state)
                         text = ""
                     }
