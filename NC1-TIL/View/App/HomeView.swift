@@ -28,7 +28,7 @@ struct HomeView: View {
             }
             
         }
-        .frame(minWidth: 700, minHeight: 500)
+        .frame(minWidth: 700, minHeight: 300)
         .onAppear {
             viewModel.setTerminalState(.load)
         }
@@ -72,13 +72,21 @@ fileprivate struct MainScrollView: View {
     let viewModel: HomeViewModel
     
     fileprivate var body: some View {
-        ScrollView {
-            LazyVStack {
-                ForEach(viewModel.monthlys, id: \.self) { monthly in
-                    MonthlyView(viewModel: viewModel, monthly: monthly)
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack {
+                    ForEach(viewModel.monthlys, id: \.self) { monthly in
+                        MonthlyView(viewModel: viewModel, monthly: monthly)
+                    }
+                }
+            }
+            .onChange(of: viewModel.monthlys) {
+                if let link = viewModel.monthlys.last?.links.last {
+                    proxy.scrollTo(link)
                 }
             }
         }
+        
     }
 }
 
@@ -139,6 +147,7 @@ fileprivate struct MonthlyView: View {
             LazyVStack(spacing: 2) {
                 ForEach(monthly.links, id: \.self) { link in
                     LinkView(viewModel: viewModel, link: link)
+                        .id(link)
                         .padding(.horizontal, 5)
                 }
             }
@@ -171,12 +180,10 @@ fileprivate struct LinkView: View {
                     Button(action: {
                         viewModel.setTerminalState(.delete(id: link.id))
                     }, label: {
-//                        Image(systemName: "trash")
                         Image(.trashPx)
                             .resizable()
                             .frame(width: 12, height: 12)
-                            .foregroundStyle(AppColor.textGray)
-                            .fontWeight(isDeleteButtonHover ? .semibold : .medium)
+                            .foregroundStyle(isDeleteButtonHover ? AppColor.textWhite : AppColor.textGray)
                     })
                     .onHover { isDeleteButtonHover = $0 }
                     .buttonStyle(PlainButtonStyle())
