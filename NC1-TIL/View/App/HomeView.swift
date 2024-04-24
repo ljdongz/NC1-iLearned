@@ -28,7 +28,7 @@ struct HomeView: View {
             }
             
         }
-        .frame(minWidth: 700, minHeight: 300)
+        .frame(minWidth: 700, minHeight: 500)
         .onAppear {
             viewModel.setTerminalState(.load)
         }
@@ -227,7 +227,7 @@ fileprivate struct CommandInputView: View {
                 TextField(viewModel.terminalText, text: $text)
                     .textFieldStyle(.plain)
                     .onSubmit {
-                        let state = TerminalCommandManager.shared.inputCommand(text.trimmingCharacters(in: .whitespaces))
+                        let state = TerminalCommandManager.shared.inputCommand(text)
                         viewModel.setTerminalState(state)
                         text = ""
                     }

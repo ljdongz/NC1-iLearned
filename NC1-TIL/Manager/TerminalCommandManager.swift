@@ -14,7 +14,7 @@ struct TerminalCommandManager {
     private init() {}
     
     func inputCommand(_ text: String) -> TerminalState {
-        let command = text.split(separator: " ").map { String($0) }
+        let command = text.trimmingCharacters(in: .whitespaces).split(separator: " ").map { String($0) }
         
         if command.count == 0 { return .done } // 입력한 명령어가 없음
         
@@ -26,7 +26,7 @@ struct TerminalCommandManager {
         case .help:
             return .help
         case .create:
-            return create(text)
+            return create(text.trimmingCharacters(in: .whitespaces))
         case .read:
             return read(command)
         case .delete:
@@ -44,7 +44,7 @@ extension TerminalCommandManager {
     /// - Returns: TerminalState
     private func create(_ text: String) -> TerminalState {
         let command = text.split(separator: "\"").map { String($0).trimmingCharacters(in: .whitespaces) }
-        if command.count != 3 { return .invalid(message: "매개변수 개수 에러") }
+        if command.count != 3 { return .invalid(message: "create command is invalid - create [\"YOUR TITLE\"] [YOUR URL]") }
         else { return .create(title: command[1], url: command[2]) }
     }
     
@@ -53,8 +53,8 @@ extension TerminalCommandManager {
     /// - Returns: TerminalState
     private func read(_ cmd: [String]) -> TerminalState {
         
-        guard cmd.count == 2 else { return .invalid(message: "매개변수 개수 에러") }
-        guard let id = Int(cmd[1]) else { return .invalid(message: "번호 입력 에러") }
+        guard cmd.count == 2 else { return .invalid(message: "read command is invalid - read [LINK NUMBER]") }
+        guard let id = Int(cmd[1]) else { return .invalid(message: "\(cmd[1]) is not number") }
         
         return .read(id: id)
     }
@@ -64,8 +64,8 @@ extension TerminalCommandManager {
     /// - Returns: TerminalState
     private func delete(_ cmd: [String]) -> TerminalState {
         
-        guard cmd.count == 2 else { return .invalid(message: "매개변수 개수 에러") }
-        guard let id = Int(cmd[1]) else { return .invalid(message: "번호 입력 에러") }
+        guard cmd.count == 2 else { return .invalid(message: "delete command is invalid - delete [LINK NUMBER]") }
+        guard let id = Int(cmd[1]) else { return .invalid(message: "\(cmd[1]) is not number") }
         
         return .delete(id: id)
     }

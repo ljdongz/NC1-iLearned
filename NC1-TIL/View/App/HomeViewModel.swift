@@ -35,7 +35,7 @@ extension HomeViewModel {
             self.getLinkFromLinkID(id)
         case .delete(let id):
             self.updateTerminalField(text: "Deleting...", isLoading: true)
-            self.deleteLink(id)
+            Task { await self.deleteLink(id) }
         case .help, .done:
             self.updateTerminalField(text: "Input Command", isLoading: false)
         case .error(let message), .invalid(message: let message):
@@ -113,7 +113,7 @@ extension HomeViewModel {
     
     /// CloudService를 통해 Link 데이터 삭제
     /// - Parameter id: Link ID
-    private func deleteLink(_ id: Int) {
+    private func deleteLink(_ id: Int) async {
         for monthly in monthlys {
             for link in monthly.links {
                 if link.id == id {
