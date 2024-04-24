@@ -7,8 +7,6 @@
 
 import Foundation
 import SwiftUI
-import AppKit
-import Cocoa
 
 class StatusBarController {
     private(set) var statusItem: NSStatusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
