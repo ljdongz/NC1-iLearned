@@ -27,8 +27,6 @@
 		57BE42D62BC7BDC6004D3706 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 57BE42D52BC7BDC6004D3706 /* Assets.xcassets */; };
 		57BE42D92BC7BDC6004D3706 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 57BE42D82BC7BDC6004D3706 /* Preview Assets.xcassets */; };
 		57BE42E12BC7BED7004D3706 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57BE42E02BC7BED7004D3706 /* MenuBarView.swift */; };
-		57BE42E42BC7BF12004D3706 /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57BE42E32BC7BF12004D3706 /* StatusBarController.swift */; };
-		57BE42EB2BC7C204004D3706 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57BE42EA2BC7C204004D3706 /* AppDelegate.swift */; };
 		57BE42ED2BC7CCB4004D3706 /* URLLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57BE42EC2BC7CCB4004D3706 /* URLLink.swift */; };
 /* End PBXBuildFile section */
 
@@ -56,8 +54,6 @@
 		57BE42D82BC7BDC6004D3706 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		57BE42DA2BC7BDC6004D3706 /* NC1_TIL.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NC1_TIL.entitlements; sourceTree = "<group>"; };
 		57BE42E02BC7BED7004D3706 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
-		57BE42E32BC7BF12004D3706 /* StatusBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = "<group>"; };
-		57BE42EA2BC7C204004D3706 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		57BE42EC2BC7CCB4004D3706 /* URLLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLLink.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -161,7 +157,6 @@
 			isa = PBXGroup;
 			children = (
 				57BE42E02BC7BED7004D3706 /* MenuBarView.swift */,
-				57BE42E32BC7BF12004D3706 /* StatusBarController.swift */,
 				577F1A7B2BCBF58E0014C2F9 /* MenuBarViewModel.swift */,
 			);
 			path = MenuBar;
@@ -211,7 +206,6 @@
 			isa = PBXGroup;
 			children = (
 				57BE42D12BC7BDC5004D3706 /* NC1_TILApp.swift */,
-				57BE42EA2BC7C204004D3706 /* AppDelegate.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -293,14 +287,12 @@
 				577F1A782BCAC5440014C2F9 /* Monthly.swift in Sources */,
 				577F1A7C2BCBF58E0014C2F9 /* MenuBarViewModel.swift in Sources */,
 				577F1A6C2BCA3DC20014C2F9 /* AppColor.swift in Sources */,
-				57BE42E42BC7BF12004D3706 /* StatusBarController.swift in Sources */,
 				577F1A662BC973290014C2F9 /* NotificationName+Ext.swift in Sources */,
 				57BE42D42BC7BDC5004D3706 /* HomeView.swift in Sources */,
 				577F1A802BCE47090014C2F9 /* Month.swift in Sources */,
 				579C882C2BD103620051845C /* TerminalCommandManager.swift in Sources */,
 				57BE42ED2BC7CCB4004D3706 /* URLLink.swift in Sources */,
 				573F3F342BD7CEF900A48ADF /* CommandHelpView.swift in Sources */,
-				57BE42EB2BC7C204004D3706 /* AppDelegate.swift in Sources */,
 				579C881C2BCEA2D40051845C /* TerminalCommand.swift in Sources */,
 				579C88222BCEBA290051845C /* AppFont.swift in Sources */,
 				577F1A742BCA58E30014C2F9 /* HomeViewModel.swift in Sources */,

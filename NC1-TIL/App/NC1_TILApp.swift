@@ -9,7 +9,6 @@ import SwiftUI
 
 @main
 struct NC1_TILApp: App {
-    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @Environment(\.openWindow) private var openWindow
     
     var body: some Scene {
@@ -28,6 +27,11 @@ struct NC1_TILApp: App {
                 }
             }
         }
+        
+        MenuBarExtra("", systemImage: "link") {
+            MenuBarView()
+        }
+        .menuBarExtraStyle(.window)
     }
 }
 
