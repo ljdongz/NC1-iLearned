@@ -17,6 +17,7 @@ protocol CloudRepository {
     
     func fetchLinks(completion: @escaping (Result<[URLLink], Error>) -> Void)
     
+    // TODO: CloudKit 의존성 제거 필요
     func deleteLink(
         _ recordID: CKRecord.ID,
         completion: @escaping (Result<String, Error>) -> Void

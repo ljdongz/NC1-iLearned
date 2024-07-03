@@ -15,7 +15,13 @@ class MenuBarViewModel {
         case complete(message: String)
     }
     
+    private let menuBarUseCase: MenuBarUseCase
+    
     private(set) var state: State = .input
+    
+    init(menuBarUseCase: MenuBarUseCase) {
+        self.menuBarUseCase = menuBarUseCase
+    }
     
     func changeState(_ state: State) {
         self.state = state

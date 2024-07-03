@@ -9,7 +9,12 @@ import Foundation
 import SwiftUI
 
 struct MenuBarView: View {
-    @State private var viewModel = MenuBarViewModel()
+    @State private var viewModel = MenuBarViewModel(
+        menuBarUseCase:
+            MenuBarUseCase(
+                cloudService: CloudService()
+            )
+    )
     
     var body: some View {
         VStack {
