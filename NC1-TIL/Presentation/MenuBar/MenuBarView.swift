@@ -18,10 +18,10 @@ struct MenuBarView: View {
     
     var body: some View {
         VStack {
-            switch viewModel.state {
+            switch viewModel.state.viewState {
             case .input:
                 InputView(viewModel: viewModel)
-            case .creating:
+            case .loading:
                 ProgressView()
             case .complete(let message):
                 CompleteView(viewModel: viewModel, message: message)
@@ -66,7 +66,7 @@ fileprivate struct InputView: View {
             
             Button(
                 action: {
-                    viewModel.changeState(.creating(title: titleText, url: urlText))
+                    viewModel.effect(.didCreate(title: titleText, url: urlText))
                 },
                 label: {
                     Text("Save")
@@ -91,7 +91,7 @@ fileprivate struct CompleteView: View {
                 
             Spacer()
             Button(
-                action: { viewModel.changeState(.input) },
+                action: { viewModel.effect(.didDone) },
                 label: {
                     Text("확인")
                         .frame(width: 270, height: 40)
