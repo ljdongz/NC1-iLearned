@@ -8,13 +8,24 @@
 import Foundation
 import CloudKit
 
-class CloudService {
-    
-    static let shared = CloudService()
-
+final class CloudService {
     private let container = CKContainer(identifier: "iCloud.NC1-TIL")
     private let recordType = "Link"
     
+    private func convertLinkFromRecord(from record: CKRecord, id: Int) -> URLLink? {
+        
+        guard let recordID = record.value(forKey: "recordID") as? CKRecord.ID,
+              let title = record.value(forKey: "title") as? String,
+              let url = record.value(forKey: "url") as? String,
+              let date = record.value(forKey: "date") as? Date else {
+            return nil
+        }
+        
+        return URLLink(recordID: recordID, id: id, title: title, url: url, date: date)
+    }
+}
+
+extension CloudService: CloudRepository {
     func saveLink(title: String, url: String, completion: @escaping (Result<String, Error>) -> Void) {
         let record = CKRecord(recordType: recordType)
         record["title"] = title
@@ -75,18 +86,5 @@ class CloudService {
             completion(.success("삭제 완료"))
         }
     }
-    
-    func convertLinkFromRecord(from record: CKRecord, id: Int) -> URLLink? {
-        
-        guard let recordID = record.value(forKey: "recordID") as? CKRecord.ID,
-              let title = record.value(forKey: "title") as? String,
-              let url = record.value(forKey: "url") as? String,
-              let date = record.value(forKey: "date") as? Date else {
-            return nil
-        }
-        
-        return URLLink(recordID: recordID, id: id, title: title, url: url, date: date)
-    }
-    
-        
 }
+

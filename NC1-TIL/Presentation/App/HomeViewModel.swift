@@ -82,16 +82,16 @@ extension HomeViewModel {
 extension HomeViewModel {
     /// CloudService를 통해 모든 Link 데이터를 가져옴
     private func fetchAllLinks() async {
-        CloudService.shared.fetchLinks { result in
-            switch result {
-            case .success(let links):
-                self.createMonthlys(links)
-                self.totalContributions = links.count
-                self.updateTerminalField(text: "Input Command", isLoading: false)
-            case .failure(let error):
-                self.updateTerminalField(text: error.localizedDescription, isLoading: false)
-            }
-        }
+//        CloudService.shared.fetchLinks { result in
+//            switch result {
+//            case .success(let links):
+//                self.createMonthlys(links)
+//                self.totalContributions = links.count
+//                self.updateTerminalField(text: "Input Command", isLoading: false)
+//            case .failure(let error):
+//                self.updateTerminalField(text: error.localizedDescription, isLoading: false)
+//            }
+//        }
     }
     
     /// CloudService를 통해 새로운 Link 데이터 생성
@@ -99,16 +99,16 @@ extension HomeViewModel {
     ///   - title: 제목
     ///   - url: URL 주소
     private func saveLink(title: String, url: String) async {
-        CloudService.shared.saveLink(title: title, url: url) { result in
-            switch result {
-            case .success:
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    Task { await self.fetchAllLinks() }
-                }
-            case .failure(let failure):
-                self.updateTerminalField(text: failure.localizedDescription, isLoading: false)
-            }
-        }
+//        CloudService.shared.saveLink(title: title, url: url) { result in
+//            switch result {
+//            case .success:
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                    Task { await self.fetchAllLinks() }
+//                }
+//            case .failure(let failure):
+//                self.updateTerminalField(text: failure.localizedDescription, isLoading: false)
+//            }
+//        }
     }
     
     /// CloudService를 통해 Link 데이터 삭제
@@ -117,14 +117,14 @@ extension HomeViewModel {
         for monthly in monthlys {
             for link in monthly.links {
                 if link.id == id {
-                    CloudService.shared.deleteLink(link.recordID) { result in
-                        switch result {
-                        case .success:
-                            Task { await self.fetchAllLinks() }
-                        case .failure(let failure):
-                            self.updateTerminalField(text: failure.localizedDescription, isLoading: false)
-                        }
-                    }
+//                    CloudService.shared.deleteLink(link.recordID) { result in
+//                        switch result {
+//                        case .success:
+//                            Task { await self.fetchAllLinks() }
+//                        case .failure(let failure):
+//                            self.updateTerminalField(text: failure.localizedDescription, isLoading: false)
+//                        }
+//                    }
                 }
             }
         }

@@ -101,14 +101,6 @@
 			path = Extension;
 			sourceTree = "<group>";
 		};
-		579C882A2BD1033C0051845C /* Manager */ = {
-			isa = PBXGroup;
-			children = (
-				579C882B2BD103620051845C /* TerminalCommandManager.swift */,
-			);
-			path = Manager;
-			sourceTree = "<group>";
-		};
 		57A98EED2C352ABA00863BC6 /* Presentation */ = {
 			isa = PBXGroup;
 			children = (
@@ -142,6 +134,7 @@
 			children = (
 				57A98EF72C355BF100863BC6 /* TerminalUseCase.swift */,
 				57A98EF92C355C1600863BC6 /* MenuBarUseCase.swift */,
+				579C882B2BD103620051845C /* TerminalCommandManager.swift */,
 			);
 			path = UseCase;
 			sourceTree = "<group>";
@@ -194,12 +187,11 @@
 			isa = PBXGroup;
 			children = (
 				57BE42E92BC7C1FB004D3706 /* App */,
-				57A98EF62C352D6300863BC6 /* Util */,
-				57A98EED2C352ABA00863BC6 /* Presentation */,
-				57A98EEE2C352ADA00863BC6 /* Domain */,
 				57A98EEF2C352ADF00863BC6 /* Data */,
-				579C882A2BD1033C0051845C /* Manager */,
+				57A98EEE2C352ADA00863BC6 /* Domain */,
+				57A98EED2C352ABA00863BC6 /* Presentation */,
 				57BE42E72BC7BFC4004D3706 /* Resource */,
+				57A98EF62C352D6300863BC6 /* Util */,
 				57BE42DA2BC7BDC6004D3706 /* NC1_TIL.entitlements */,
 				57BE42D72BC7BDC6004D3706 /* Preview Content */,
 			);

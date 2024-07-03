@@ -30,14 +30,14 @@ class MenuBarViewModel {
     
     private func saveLink(title: String, url: String) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            CloudService.shared.saveLink(title: title, url: url) { result in
-                switch result {
-                case .success(let success):
-                    self.changeState(.complete(message: success))
-                case .failure(let failure):
-                    self.changeState(.complete(message: failure.localizedDescription))
-                }
-            }
+//            CloudService.shared.saveLink(title: title, url: url) { result in
+//                switch result {
+//                case .success(let success):
+//                    self.changeState(.complete(message: success))
+//                case .failure(let failure):
+//                    self.changeState(.complete(message: failure.localizedDescription))
+//                }
+//            }
         }
     }
 }
