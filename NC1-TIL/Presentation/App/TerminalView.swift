@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct HomeView: View {
-    @State private var viewModel = HomeViewModel()
+struct TerminalView: View {
+    @State private var viewModel = TerminalViewModel()
     
     var body: some View {
         ZStack {
@@ -37,7 +37,7 @@ struct HomeView: View {
 
 // MARK: - 새로고침 버튼
 fileprivate struct RefreshButton: View {
-    var viewModel: HomeViewModel
+    var viewModel: TerminalViewModel
     
     fileprivate var body: some View {
         
@@ -69,7 +69,7 @@ fileprivate struct RefreshButton: View {
 
 // MARK: - 메인 스크롤 화면
 fileprivate struct MainScrollView: View {
-    let viewModel: HomeViewModel
+    let viewModel: TerminalViewModel
     
     fileprivate var body: some View {
         ScrollViewReader { proxy in
@@ -92,7 +92,7 @@ fileprivate struct MainScrollView: View {
 
 // MARK: - 월별 화면
 fileprivate struct MonthlyView: View {
-    let viewModel: HomeViewModel
+    let viewModel: TerminalViewModel
     let monthly: Monthly
     
     fileprivate var body: some View {
@@ -157,7 +157,7 @@ fileprivate struct MonthlyView: View {
 
 // MARK: - 링크 화면
 fileprivate struct LinkView: View {
-    let viewModel: HomeViewModel
+    let viewModel: TerminalViewModel
     let link: URLLink
     
     @State private var isLinkButtonHover: Bool = false
@@ -207,7 +207,7 @@ fileprivate struct LinkView: View {
 
 // MARK: - 커멘트 입력 창
 fileprivate struct CommandInputView: View {
-    let viewModel: HomeViewModel
+    let viewModel: TerminalViewModel
     @State private var text: String = ""
     @FocusState private var isFocused: Bool
     
@@ -249,7 +249,7 @@ fileprivate struct CustomButtonStyle: ButtonStyle {
 }
 
 #Preview {
-    HomeView()
+    TerminalView()
 }
 
 

@@ -9,7 +9,7 @@ import Foundation
 import AppKit
 
 @Observable
-class HomeViewModel {
+class TerminalViewModel {
     
     private(set) var monthlys: [Monthly] = []
     private(set) var totalContributions: Int = 0
@@ -19,7 +19,7 @@ class HomeViewModel {
 
 
 // MARK: - HomeView 관련 로직
-extension HomeViewModel {
+extension TerminalViewModel {
     /// 터미널 입력 필드 상태를 변경
     /// - Parameter state: 터미널 상태 종류
     func setTerminalState(_ state: TerminalState) {
@@ -79,7 +79,7 @@ extension HomeViewModel {
 }
 
 // MARK: - CloudSerivce 관련 로직
-extension HomeViewModel {
+extension TerminalViewModel {
     /// CloudService를 통해 모든 Link 데이터를 가져옴
     private func fetchAllLinks() async {
 //        CloudService.shared.fetchLinks { result in
@@ -132,7 +132,7 @@ extension HomeViewModel {
 }
 
 // MARK: - Date 관련 로직
-extension HomeViewModel {
+extension TerminalViewModel {
     
     /// Link 데이터로 Monthlys 데이터를 만듦
     /// - Parameter links: [Link] 데이터

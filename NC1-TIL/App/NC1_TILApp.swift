@@ -13,7 +13,7 @@ struct NC1_TILApp: App {
     
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            TerminalView()
         }
         WindowGroup(id: "help") {
             CommandHelpView()
