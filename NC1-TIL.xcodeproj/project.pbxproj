@@ -21,7 +21,6 @@
 		579C881C2BCEA2D40051845C /* TerminalCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 579C881B2BCEA2D40051845C /* TerminalCommand.swift */; };
 		579C88222BCEBA290051845C /* AppFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 579C88212BCEBA290051845C /* AppFont.swift */; };
 		579C88292BCEBC7B0051845C /* DungGeunMo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 579C88282BCEBC7A0051845C /* DungGeunMo.ttf */; };
-		579C882C2BD103620051845C /* TerminalCommandManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 579C882B2BD103620051845C /* TerminalCommandManager.swift */; };
 		57A98EF52C352BA800863BC6 /* CloudRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A98EF42C352BA800863BC6 /* CloudRepository.swift */; };
 		57A98EF82C355BF100863BC6 /* TerminalUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A98EF72C355BF100863BC6 /* TerminalUseCase.swift */; };
 		57A98EFA2C355C1600863BC6 /* MenuBarUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A98EF92C355C1600863BC6 /* MenuBarUseCase.swift */; };
@@ -49,7 +48,6 @@
 		579C88202BCEB8EB0051845C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		579C88212BCEBA290051845C /* AppFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFont.swift; sourceTree = "<group>"; };
 		579C88282BCEBC7A0051845C /* DungGeunMo.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = DungGeunMo.ttf; sourceTree = "<group>"; };
-		579C882B2BD103620051845C /* TerminalCommandManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerminalCommandManager.swift; sourceTree = "<group>"; };
 		57A98EF42C352BA800863BC6 /* CloudRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudRepository.swift; sourceTree = "<group>"; };
 		57A98EF72C355BF100863BC6 /* TerminalUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerminalUseCase.swift; sourceTree = "<group>"; };
 		57A98EF92C355C1600863BC6 /* MenuBarUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarUseCase.swift; sourceTree = "<group>"; };
@@ -134,7 +132,6 @@
 			children = (
 				57A98EF72C355BF100863BC6 /* TerminalUseCase.swift */,
 				57A98EF92C355C1600863BC6 /* MenuBarUseCase.swift */,
-				579C882B2BD103620051845C /* TerminalCommandManager.swift */,
 			);
 			path = UseCase;
 			sourceTree = "<group>";
@@ -324,7 +321,6 @@
 				57BE42D42BC7BDC5004D3706 /* TerminalView.swift in Sources */,
 				577F1A802BCE47090014C2F9 /* Month.swift in Sources */,
 				57A98EF82C355BF100863BC6 /* TerminalUseCase.swift in Sources */,
-				579C882C2BD103620051845C /* TerminalCommandManager.swift in Sources */,
 				57BE42ED2BC7CCB4004D3706 /* URLLink.swift in Sources */,
 				573F3F342BD7CEF900A48ADF /* CommandHelpView.swift in Sources */,
 				57A98EF52C352BA800863BC6 /* CloudRepository.swift in Sources */,

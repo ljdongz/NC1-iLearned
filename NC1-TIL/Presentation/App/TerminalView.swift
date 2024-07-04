@@ -42,7 +42,7 @@ fileprivate struct RefreshButton: View {
     fileprivate var body: some View {
         
         HStack {
-            Text("\(viewModel.totalContributions) contributions so far.")
+            Text("\(viewModel.state.totalContributions) contributions so far.")
                 .font(.custom(AppFont.main, size: 20))
                 .fontWeight(.semibold)
             Spacer()
@@ -75,13 +75,13 @@ fileprivate struct MainScrollView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack {
-                    ForEach(viewModel.monthlys, id: \.self) { monthly in
+                    ForEach(viewModel.state.monthlys, id: \.self) { monthly in
                         MonthlyView(viewModel: viewModel, monthly: monthly)
                     }
                 }
             }
-            .onChange(of: viewModel.monthlys) {
-                if let link = viewModel.monthlys.last?.links.last {
+            .onChange(of: viewModel.state.monthlys) {
+                if let link = viewModel.state.monthlys.last?.links.last {
                     proxy.scrollTo(link)
                 }
             }
@@ -213,10 +213,10 @@ fileprivate struct CommandInputView: View {
     
     fileprivate var body: some View {
         HStack {
-            if viewModel.isLoading {
+            if viewModel.state.isLoading {
                 VStack(alignment: .leading) {
                     HStack {
-                        Text(viewModel.terminalText)
+                        Text(viewModel.state.terminalText)
                         
                         ProgressView()
                             .frame(width: 12, height: 12)
@@ -224,11 +224,10 @@ fileprivate struct CommandInputView: View {
                     }
                 }
             } else {
-                TextField(viewModel.terminalText, text: $text)
+                TextField(viewModel.state.terminalText, text: $text)
                     .textFieldStyle(.plain)
                     .onSubmit {
-                        let state = TerminalCommandManager.shared.inputCommand(text)
-                        viewModel.setTerminalState(state)
+                        viewModel.effect(.enterCommand(command: text))
                         text = ""
                     }
                     .focused($isFocused)

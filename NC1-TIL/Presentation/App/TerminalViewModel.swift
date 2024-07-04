@@ -11,10 +11,112 @@ import AppKit
 @Observable
 class TerminalViewModel {
     
-    private(set) var monthlys: [Monthly] = []
-    private(set) var totalContributions: Int = 0
-    private(set) var isLoading: Bool = false
-    private(set) var terminalText: String = ""
+    enum Action {
+        case enterCommand(command: String)
+    }
+    
+    struct State {
+        var isLoading: Bool = true
+        var terminalText: String = ""
+        var totalContributions: Int = 0
+        var monthlys: [Monthly] = []
+    }
+    
+    private(set) var state: State = .init()
+    
+    func effect(_ action: Action) {
+        switch action {
+        case .enterCommand(let command):
+            self.validateCommand(command)
+        }
+    }
+}
+
+extension TerminalViewModel {
+    private func enterCommand(cmd: String) {
+        let commandState = validateCommand(cmd)
+    }
+    
+    private func validateCommand(_ cmd: String) -> CommandState {
+        let command = cmd
+            .trimmingCharacters(in: .whitespaces)
+            .split(separator: " ")
+            .map { String($0) }
+        
+        // 입력한 명령어가 없음
+        if command.count == 0 { return .none }
+        
+        guard let mainCommand = TerminalCommand(rawValue: command[0]) else {
+            // 존재하지 않는 명령어
+            return .invalid(message: "\(command[0]) is invalid command")
+        }
+        
+        switch mainCommand {
+        case .help:
+            return .help
+            self.updateTerminalField(text: "", isLoading: false)
+        case .create:
+            self.updateTerminalField(text: "Creating ...", isLoading: true)
+//            return create(text.trimmingCharacters(in: .whitespaces))
+            return create(cmd.trimmingCharacters(in: .whitespaces))
+            
+            // TODO: TerminalUseCase를 통해 Cloud Create 작업 필요
+        case .read:
+            self.updateTerminalField(text: "", isLoading: false)
+            
+            return read(command)
+            // TODO: Read 작업 필요
+        case .delete:
+//            return delete(command)
+            self.updateTerminalField(text: "Deleting ...", isLoading: true)
+            
+            return delete(command)
+            // TODO: TerminalUseCase를 통해 Cloud Delete 작업 필요
+        case .refresh:
+            self.updateTerminalField(text: "Loading ...", isLoading: true)
+            
+            return .load
+            // TODO: TerminalUseCase를 통해 Cloud Fetch 작업 필요
+        }
+    }
+    
+    private func updateTerminalField(text: String, isLoading: Bool) {
+        self.state.terminalText = text
+        self.state.isLoading = isLoading
+    }
+}
+
+extension TerminalViewModel {
+    /// Create 커멘드 명령 로직
+    /// - Parameter text: 기존 터미널에 입력한 Text
+    /// - Returns: TerminalState
+    private func create(_ text: String) -> CommandState {
+        let command = text.split(separator: "\"").map { String($0).trimmingCharacters(in: .whitespaces) }
+        if command.count != 3 { return .invalid(message: "create command is invalid - create [\"YOUR TITLE\"] [YOUR URL]") }
+        else { return .create(title: command[1], url: command[2]) }
+    }
+    
+    /// Read 커멘드 명령 로직
+    /// - Parameter cmd: 터미널에 입력한 Text를 " "로 split한 문자열 배열
+    /// - Returns: TerminalState
+    private func read(_ cmd: [String]) -> CommandState {
+        
+        guard cmd.count == 2 else { return .invalid(message: "read command is invalid - read [LINK NUMBER]") }
+        guard let id = Int(cmd[1]) else { return .invalid(message: "\(cmd[1]) is not number") }
+        
+        return .read(id: id)
+    }
+    
+    /// Delete 커멘트 명령 로직
+    /// - Parameter cmd: 터미널에 입력한 Text를 " "로 split한 문자열 배열
+    /// - Returns: TerminalState
+    private func delete(_ cmd: [String]) -> CommandState {
+        
+        guard cmd.count == 2 else { return .invalid(message: "delete command is invalid - delete [LINK NUMBER]") }
+        guard let id = Int(cmd[1]) else { return .invalid(message: "\(cmd[1]) is not number") }
+        
+        return .delete(id: id)
+    }
 }
 
 
@@ -22,7 +124,7 @@ class TerminalViewModel {
 extension TerminalViewModel {
     /// 터미널 입력 필드 상태를 변경
     /// - Parameter state: 터미널 상태 종류
-    func setTerminalState(_ state: TerminalState) {
+    func setTerminalState(_ state: CommandState) {
         switch state {
         case .load:
             self.updateTerminalField(text: "Loading...", isLoading: true)
@@ -36,7 +138,7 @@ extension TerminalViewModel {
         case .delete(let id):
             self.updateTerminalField(text: "Deleting...", isLoading: true)
             Task { await self.deleteLink(id) }
-        case .help, .done:
+        case .help, .done, .none:
             self.updateTerminalField(text: "Input Command", isLoading: false)
         case .error(let message), .invalid(message: let message):
             self.updateTerminalField(text: message, isLoading: false)
@@ -47,15 +149,15 @@ extension TerminalViewModel {
     /// - Parameters:
     ///   - text: TextField에 보여줄 text
     ///   - isLoading: ProgressView를 나타낼지 여부
-    private func updateTerminalField(text: String, isLoading: Bool) {
-        self.terminalText = text
-        self.isLoading = isLoading
-    }
+//    private func updateTerminalField(text: String, isLoading: Bool) {
+//        self.terminalText = text
+//        self.isLoading = isLoading
+//    }
     
     /// URL 주소로 이동
     /// - Parameter id: Link ID
     private func getLinkFromLinkID(_ id: Int) {
-        for monthly in monthlys {
+        for monthly in state.monthlys {
             for link in monthly.links {
                 if link.id == id {
                     let isValid = openURL(urlString: link.url)
@@ -114,7 +216,7 @@ extension TerminalViewModel {
     /// CloudService를 통해 Link 데이터 삭제
     /// - Parameter id: Link ID
     private func deleteLink(_ id: Int) async {
-        for monthly in monthlys {
+        for monthly in state.monthlys {
             for link in monthly.links {
                 if link.id == id {
 //                    CloudService.shared.deleteLink(link.recordID) { result in
@@ -148,7 +250,7 @@ extension TerminalViewModel {
             newMonthlys.append(Monthly(date: key, days: days, links: value))
         }
         
-        monthlys = newMonthlys
+        state.monthlys = newMonthlys
     }
     
     /// Link 데이터를 Date별로 그룹화

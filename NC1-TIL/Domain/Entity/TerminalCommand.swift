@@ -17,7 +17,7 @@ enum TerminalCommand: String {
 }
 
 // 터미널 상태
-enum TerminalState {
+enum CommandState {
     case load
     case create(title: String, url: String)
     case read(id: Int)
@@ -26,6 +26,7 @@ enum TerminalState {
     case error(message: String)
     case done
     case invalid(message: String)
+    case none
 }
 
 enum CommandError: Error {
