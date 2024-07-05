@@ -8,7 +8,11 @@
 import SwiftUI
 
 struct TerminalView: View {
-    @State private var viewModel = TerminalViewModel()
+    @State private var viewModel = TerminalViewModel(
+        terminalUseCase: TerminalUseCase(
+            cloudService: CloudService()
+        )
+    )
     
     var body: some View {
         ZStack {
@@ -30,7 +34,7 @@ struct TerminalView: View {
         }
         .frame(minWidth: 700, minHeight: 500)
         .onAppear {
-            viewModel.setTerminalState(.load)
+            viewModel.effect(.onAppear)
         }
     }
 }
@@ -52,7 +56,8 @@ fileprivate struct RefreshButton: View {
                 .font(.custom(AppFont.main, size: 12))
             Button(
                 action: {
-                    viewModel.setTerminalState(.load)
+                    // TODO: 이후 제거
+//                    viewModel.effect(.onAppear)
                 },
                 label: {
                     Image(.refreshPx)
@@ -178,7 +183,7 @@ fileprivate struct LinkView: View {
                 
                 if isLinkButtonHover {
                     Button(action: {
-                        viewModel.setTerminalState(.delete(id: link.id))
+//                        viewModel.setTerminalState(.delete(id: link.id))
                     }, label: {
                         Image(.trashPx)
                             .resizable()

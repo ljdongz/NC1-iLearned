@@ -13,29 +13,37 @@ class TerminalViewModel {
     
     enum Action {
         case enterCommand(command: String)
+        case onAppear
     }
     
     struct State {
-        var isLoading: Bool = true
+        var isLoading: Bool = false
         var terminalText: String = ""
         var totalContributions: Int = 0
         var monthlys: [Monthly] = []
     }
     
+    private let terminalUseCase: TerminalUseCase
+    
     private(set) var state: State = .init()
+    
+    init(terminalUseCase: TerminalUseCase) {
+        self.terminalUseCase = terminalUseCase
+    }
     
     func effect(_ action: Action) {
         switch action {
         case .enterCommand(let command):
-            self.validateCommand(command)
+            let commandState = self.validateCommand(command)
+            self.handlingCommand(commandState)
+        case .onAppear:
+            self.handlingCommand(.load)
         }
     }
 }
 
+// MARK: - TerminalCommand 관련 로직
 extension TerminalViewModel {
-    private func enterCommand(cmd: String) {
-        let commandState = validateCommand(cmd)
-    }
     
     private func validateCommand(_ cmd: String) -> CommandState {
         let command = cmd
@@ -54,29 +62,106 @@ extension TerminalViewModel {
         switch mainCommand {
         case .help:
             return .help
-            self.updateTerminalField(text: "", isLoading: false)
         case .create:
-            self.updateTerminalField(text: "Creating ...", isLoading: true)
-//            return create(text.trimmingCharacters(in: .whitespaces))
             return create(cmd.trimmingCharacters(in: .whitespaces))
-            
             // TODO: TerminalUseCase를 통해 Cloud Create 작업 필요
         case .read:
-            self.updateTerminalField(text: "", isLoading: false)
-            
             return read(command)
             // TODO: Read 작업 필요
         case .delete:
-//            return delete(command)
-            self.updateTerminalField(text: "Deleting ...", isLoading: true)
-            
             return delete(command)
             // TODO: TerminalUseCase를 통해 Cloud Delete 작업 필요
         case .refresh:
-            self.updateTerminalField(text: "Loading ...", isLoading: true)
-            
             return .load
             // TODO: TerminalUseCase를 통해 Cloud Fetch 작업 필요
+        }
+    }
+    
+    private func handlingCommand(_ state: CommandState) {
+        switch state {
+        case .load:
+            self.updateTerminalField(text: "Loading ...", isLoading: true)
+            
+            // TODO: state에 URLLinks 업데이트
+            self.terminalUseCase.fetchLinks { result in
+                switch result {
+                case .success(let success):
+                    self.state.monthlys = self.createMonthlys(success)
+                    self.updateTerminalField(text: "", isLoading: false)
+                    self.state.totalContributions = success.count
+                case .failure(let failure):
+                    self.updateTerminalField(text: failure.localizedDescription, isLoading: false)
+                }
+            }
+            
+        case .create(let title, let url):
+            self.updateTerminalField(text: "Creating ...", isLoading: true)
+            
+            self.terminalUseCase.saveLink(title: title, url: url) { result in
+                switch result {
+                case .success:
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        self.terminalUseCase.fetchLinks { result in
+                            switch result {
+                            case .success(let success):
+                                self.state.monthlys = self.createMonthlys(success)
+                                self.updateTerminalField(text: "", isLoading: false)
+                                self.state.totalContributions = success.count
+                            case .failure(let failure):
+                                self.updateTerminalField(text: failure.localizedDescription, isLoading: false)
+                            }
+                        }
+                    }
+                    
+                case .failure(let failure):
+                    self.updateTerminalField(text: failure.localizedDescription, isLoading: false)
+                }
+            }
+            
+        case .read(let id):
+            self.updateTerminalField(text: "", isLoading: false)
+            for monthly in self.state.monthlys {
+                for link in monthly.links {
+                    if link.id == id {
+                        let isValid = terminalUseCase.openLink(link)
+                        let text = isValid ? "Input Command" : "유효하지 않은 URL"
+                        self.updateTerminalField(text: text, isLoading: false)
+                    }
+                }
+            }
+            
+        case .delete(let id):
+            self.updateTerminalField(text: "Deleting ...", isLoading: true)
+            
+            for monthly in self.state.monthlys {
+                for link in monthly.links {
+                    if link.id == id {
+                        self.terminalUseCase.deleteLink(link) { result in
+                            switch result {
+                            case .success(let success):
+                                self.terminalUseCase.fetchLinks { result in
+                                    switch result {
+                                    case .success(let success):
+                                        self.state.monthlys = self.createMonthlys(success)
+                                        self.updateTerminalField(text: "", isLoading: false)
+                                        self.state.totalContributions = success.count
+                                    case .failure(let failure):
+                                        self.updateTerminalField(text: failure.localizedDescription, isLoading: false)
+                                    }
+                                }
+                            case .failure(let failure):
+                                self.updateTerminalField(text: failure.localizedDescription, isLoading: false)
+                            }
+                        }
+                    }
+                }
+            }
+            
+        case .help, .done, .none:
+            self.updateTerminalField(text: "", isLoading: false)
+            
+        case .error(let message), .invalid(let message):
+            self.updateTerminalField(text: message, isLoading: false)
         }
     }
     
@@ -120,125 +205,12 @@ extension TerminalViewModel {
 }
 
 
-// MARK: - HomeView 관련 로직
-extension TerminalViewModel {
-    /// 터미널 입력 필드 상태를 변경
-    /// - Parameter state: 터미널 상태 종류
-    func setTerminalState(_ state: CommandState) {
-        switch state {
-        case .load:
-            self.updateTerminalField(text: "Loading...", isLoading: true)
-            Task { await fetchAllLinks() }
-        case .create(let title, let url):
-            self.updateTerminalField(text: "Creating...", isLoading: true)
-            Task { await saveLink(title: title, url: url) }
-        case .read(let id):
-            self.updateTerminalField(text: "Input Command", isLoading: false)
-            self.getLinkFromLinkID(id)
-        case .delete(let id):
-            self.updateTerminalField(text: "Deleting...", isLoading: true)
-            Task { await self.deleteLink(id) }
-        case .help, .done, .none:
-            self.updateTerminalField(text: "Input Command", isLoading: false)
-        case .error(let message), .invalid(message: let message):
-            self.updateTerminalField(text: message, isLoading: false)
-        }
-    }
-    
-    /// Terminal Input Field 상태를 변경
-    /// - Parameters:
-    ///   - text: TextField에 보여줄 text
-    ///   - isLoading: ProgressView를 나타낼지 여부
-//    private func updateTerminalField(text: String, isLoading: Bool) {
-//        self.terminalText = text
-//        self.isLoading = isLoading
-//    }
-    
-    /// URL 주소로 이동
-    /// - Parameter id: Link ID
-    private func getLinkFromLinkID(_ id: Int) {
-        for monthly in state.monthlys {
-            for link in monthly.links {
-                if link.id == id {
-                    let isValid = openURL(urlString: link.url)
-                    let text = isValid ? "Input Command" : "유효하지 않은 URL"
-                    self.updateTerminalField(text: text, isLoading: false)
-                }
-            }
-        }
-    }
-    
-    /// URL 주소로 브라우저를 엶
-    /// - Parameter urlString: url 주소
-    /// - Returns: URL 주소가 유효한지에 대한 여부
-    private func openURL(urlString: String) -> Bool {
-        guard let url = URL(string: urlString) else {
-            return false
-        }
-        
-        return NSWorkspace.shared.open(url)
-    }
-}
-
-// MARK: - CloudSerivce 관련 로직
-extension TerminalViewModel {
-    /// CloudService를 통해 모든 Link 데이터를 가져옴
-    private func fetchAllLinks() async {
-//        CloudService.shared.fetchLinks { result in
-//            switch result {
-//            case .success(let links):
-//                self.createMonthlys(links)
-//                self.totalContributions = links.count
-//                self.updateTerminalField(text: "Input Command", isLoading: false)
-//            case .failure(let error):
-//                self.updateTerminalField(text: error.localizedDescription, isLoading: false)
-//            }
-//        }
-    }
-    
-    /// CloudService를 통해 새로운 Link 데이터 생성
-    /// - Parameters:
-    ///   - title: 제목
-    ///   - url: URL 주소
-    private func saveLink(title: String, url: String) async {
-//        CloudService.shared.saveLink(title: title, url: url) { result in
-//            switch result {
-//            case .success:
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//                    Task { await self.fetchAllLinks() }
-//                }
-//            case .failure(let failure):
-//                self.updateTerminalField(text: failure.localizedDescription, isLoading: false)
-//            }
-//        }
-    }
-    
-    /// CloudService를 통해 Link 데이터 삭제
-    /// - Parameter id: Link ID
-    private func deleteLink(_ id: Int) async {
-        for monthly in state.monthlys {
-            for link in monthly.links {
-                if link.id == id {
-//                    CloudService.shared.deleteLink(link.recordID) { result in
-//                        switch result {
-//                        case .success:
-//                            Task { await self.fetchAllLinks() }
-//                        case .failure(let failure):
-//                            self.updateTerminalField(text: failure.localizedDescription, isLoading: false)
-//                        }
-//                    }
-                }
-            }
-        }
-    }
-}
-
 // MARK: - Date 관련 로직
 extension TerminalViewModel {
     
     /// Link 데이터로 Monthlys 데이터를 만듦
     /// - Parameter links: [Link] 데이터
-    private func createMonthlys(_ links: [URLLink]) {
+    private func createMonthlys(_ links: [URLLink]) -> [Monthly] {
         
         let dic = groupedLink(links)
         let sortedDic = dic.sorted { $0.key < $1.key }
@@ -250,7 +222,7 @@ extension TerminalViewModel {
             newMonthlys.append(Monthly(date: key, days: days, links: value))
         }
         
-        state.monthlys = newMonthlys
+        return newMonthlys
     }
     
     /// Link 데이터를 Date별로 그룹화
