@@ -54,19 +54,6 @@ fileprivate struct RefreshButton: View {
             Text("최근 업데이트: \(Date().convertToString())")
                 .foregroundStyle(AppColor.textGray)
                 .font(.custom(AppFont.main, size: 12))
-            Button(
-                action: {
-                    // TODO: 이후 제거
-//                    viewModel.effect(.onAppear)
-                },
-                label: {
-                    Image(.refreshPx)
-                        .resizable()
-                        .frame(width: 12, height: 14)
-                }
-            )
-            .buttonStyle(CustomButtonStyle())
-            
         }
         
     }
@@ -165,9 +152,6 @@ fileprivate struct LinkView: View {
     let viewModel: TerminalViewModel
     let link: URLLink
     
-    @State private var isLinkButtonHover: Bool = false
-    @State private var isDeleteButtonHover: Bool = false
-    
     fileprivate var body: some View {
         HStack {
             HStack {
@@ -175,29 +159,11 @@ fileprivate struct LinkView: View {
                     Text("[\(link.id)\t]")
 
                     Text(link.title)
-                        .underline(isLinkButtonHover)
                         .tint(AppColor.textGray)
                         .lineLimit(1)
                 })
-                
-                
-                if isLinkButtonHover {
-                    Button(action: {
-//                        viewModel.setTerminalState(.delete(id: link.id))
-                    }, label: {
-                        Image(.trashPx)
-                            .resizable()
-                            .frame(width: 12, height: 12)
-                            .foregroundStyle(isDeleteButtonHover ? AppColor.textWhite : AppColor.textGray)
-                    })
-                    .onHover { isDeleteButtonHover = $0 }
-                    .buttonStyle(PlainButtonStyle())
-                    
-                }
-                
                 Spacer()
             }
-            .onHover { isLinkButtonHover = $0 }
             
             Text("\(link.date.convertToString())")
                 .frame(width: 120)
@@ -212,9 +178,10 @@ fileprivate struct LinkView: View {
 
 // MARK: - 커멘트 입력 창
 fileprivate struct CommandInputView: View {
-    let viewModel: TerminalViewModel
     @State private var text: String = ""
     @FocusState private var isFocused: Bool
+    
+    let viewModel: TerminalViewModel
     
     fileprivate var body: some View {
         HStack {

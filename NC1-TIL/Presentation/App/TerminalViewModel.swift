@@ -64,16 +64,12 @@ extension TerminalViewModel {
             return .help
         case .create:
             return create(cmd.trimmingCharacters(in: .whitespaces))
-            // TODO: TerminalUseCase를 통해 Cloud Create 작업 필요
         case .read:
             return read(command)
-            // TODO: Read 작업 필요
         case .delete:
             return delete(command)
-            // TODO: TerminalUseCase를 통해 Cloud Delete 작업 필요
         case .refresh:
             return .load
-            // TODO: TerminalUseCase를 통해 Cloud Fetch 작업 필요
         }
     }
     
@@ -82,7 +78,6 @@ extension TerminalViewModel {
         case .load:
             self.updateTerminalField(text: "Loading ...", isLoading: true)
             
-            // TODO: state에 URLLinks 업데이트
             self.terminalUseCase.fetchLinks { result in
                 switch result {
                 case .success(let success):
