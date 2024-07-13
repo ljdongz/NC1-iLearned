@@ -22,10 +22,8 @@
 ### 5. delete 명령어로 등록한 링크를 삭제
 ![delete](https://github.com/ljdongz/NC1-iLearned/assets/87902884/7fd47ac1-1c25-44ba-87b0-1a608d076e7f)
 
-### 6. 마우스 클릭을 이용한 delete, refresh, read 동작
-![touch](https://github.com/ljdongz/NC1-iLearned/assets/87902884/ef225cd6-bf72-44da-9f7e-7d1974f7d0e0)
 
 ## 기술 스택
 - SwiftUI
-- MVVM
+- Clean Architecture (MVVM)
 - CloudKit
